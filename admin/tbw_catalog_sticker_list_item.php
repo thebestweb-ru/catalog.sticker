@@ -1,6 +1,7 @@
 <?
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
+    TheBestWeb\CatalogSticker,
     TheBestWeb\CatalogSticker\ListTable,
     TheBestWeb\CatalogSticker\ListSectionsTable;
 
@@ -29,9 +30,14 @@ $POST_RIGHT = $APPLICATION->GetGroupRight($MODULE_ID);
 if($POST_RIGHT=="D")
     $APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
 
+$SITE_ID=$_REQUEST['site'] ? $_REQUEST['site'] : null;
+$rsSites = CSite::GetList($by = "sort", $order = "desc", Array("ACTIVE" => "Y",'LID'=>$SITE_ID));
+if (!$arSite = $rsSites->Fetch()) {
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_SITE_ID"));
+    return false;
+}
 
-
-$rsSites = CSite::GetList($by="sort", $order="desc", Array());
+$rsSites = CSite::GetList($by="sort", $order="desc", Array("ACTIVE"=>"Y"));
 while ($arSite = $rsSites->Fetch())
 {
     $arSites[$arSite['LID']] = '['.$arSite['LID'].'] '.$arSite['NAME'];
@@ -126,6 +132,9 @@ if(
         $bVarsFromForm = true;
     }
 }
+$default_type_keys=array_keys (CatalogSticker::GetTypeStickers());
+$default_type=$default_type_keys[0];
+
 // выборка данных
 if($ID>0 )
 {
@@ -133,6 +142,7 @@ if($ID>0 )
     if($Item=$result->fetch()){
         $ID=$Item['ID'];
         $bVarsFromForm = true;
+        $default_type=$Item['TYPE'];
     }
 }
 
@@ -150,12 +160,14 @@ if($message)
     <form method="POST" Action="<?echo $APPLICATION->GetCurPage()?>" ENCTYPE="multipart/form-data" name="post_form">
         <?echo bitrix_sessid_post();?>
         <input type="hidden" name="lang" value="<?=LANG?>">
+        <input type="hidden" name="site" value="<?=$SITE_ID?>">
         <input type="hidden" name="action" value="<?=$bVarsFromForm ? 'update' : 'add';?>">
         <input type="hidden" name="ID" value="<?=$ID ? $ID : '';?>">
 
         <?
         $tabControl->Begin();
         $tabControl->BeginNextTab();
+        CJSCore::Init(array('date'));
         ?>
         <?if(!empty($arSites)):?>
             <?foreach ($arSites as $lid=>$site_name):?>
@@ -163,28 +175,44 @@ if($message)
             <?endforeach;?>
         <?endif;?>
         <tr>
-            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_NAME")?></td>
-            <td><input type="text" name="NAME" value="<?=$Item['NAME'];?>" size="30" maxlength="100" ></td>
+            <td><span class="required">*</span><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_SITE_ID")?></td>
+            <td><label><?=$Item['SITE_ID'] ? $Item['SITE_ID'] : $SITE_ID;?></label></td>
+        </tr>
+        <tr>
+            <td><span class="required">*</span><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_NAME")?></td>
+            <td><input type="text" name="NAME" value="<?=$Item['NAME'];?>" size="50" ></td>
         </tr>
         <tr>
             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_DATE_START")?></td>
-            <td><input type="text" name="DATE_START" value="<?=$Item['DATE_START'];?>" size="30" maxlength="100" ></td>
+            <td><?echo CAdminCalendar::CalendarDate("ACTIVE_START", $Item['ACTIVE_START'], 19, true)?></td>
         </tr>
         <tr>
             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_DATE_END")?></td>
-            <td><input type="text" name="DATE_END" value="<?=$Item['DATE_END'];?>" size="30" maxlength="100" ></td>
+            <td><?echo CAdminCalendar::CalendarDate("ACTIVE_END", $Item['ACTIVE_END'], 19, true)?></td>
         </tr>
         <tr>
             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_ACTIVE")?></td>
-            <td><?=InputType("checkbox", "ACTIVE", "Y", '',  '','',$Item['ACTIVE'] ? 'checked':'');?>
+            <td>
+                <?if(isset($Item['ACTIVE'])):?>
+                    <?=InputType("checkbox", "ACTIVE", "Y", '',  '','',$Item['ACTIVE'] ? 'checked':'');?>
+                <?else:?>
+                    <?=InputType("checkbox", "ACTIVE", "Y", '',  '','','checked');?>
+                <?endif;?>
+            </td>
         </tr>
         <tr>
             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_SORT")?></td>
-            <td><input type="text" name="SORT" value="<?=$Item['SORT'];?>" size="30" maxlength="100" ></td>
+            <td><input type="text" name="SORT" value="<?=$Item['SORT'];?>" size="20"></td>
         </tr>
         <tr>
-            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_TYPE")?></td>
-            <td><input type="text" name="TYPE" value="<?=$Item['TYPE'];?>" size="30" maxlength="100" ></td>
+            <td><span class="required">*</span><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_TYPE")?></td>
+            <td>
+                <?
+                echo SelectBoxFromArray("TYPE", array("REFERENCE" => array_values (CatalogSticker::GetTypeStickers()), "REFERENCE_ID" => array_keys (CatalogSticker::GetTypeStickers())),$Item['TYPE'],'','onchange="ChangeTypeOptions(this.value)"');
+                ?>
+            </td>
+        </tr>
+        <tr id="type-options">
         </tr>
         <?
         // завершение формы - вывод кнопок сохранения изменений
@@ -199,7 +227,29 @@ if($message)
         $tabControl->ShowWarnings("post_form", $message);
         ?>
         <?echo BeginNote();?>
-        <span class="required">*</span><?echo GetMessage("REQUIRED_FIELDS")?>
+        <span class="required">*</span><?echo Loc::getMessage("REQUIRED_FIELDS")?>
         <?echo EndNote();?>
     </form>
+<script>
+    ChangeTypeOptions('<?=CUtil::JSEscape($default_type)?>');
+    function ChangeTypeOptions(type){
+        var actionUrl = '/bitrix/admin/tbw_catalog_sticker_list_type_options.php?lang=' + BX.message('LANGUAGE_ID');
+        var data=[];
+        data['ID'] = '<?=CUtil::JSEscape($ID)?>';
+        data['TYPE'] = type;
+        data['sessid'] = BX.bitrix_sessid();
+        data = BX.ajax.prepareData(data);
+
+        BX.ajax({
+            method: 'POST',
+            dataType: 'html',
+            url: actionUrl,
+            data:  data,
+            onsuccess: function(data){
+                BX('type-options').innerHTML=data;
+            }
+        });
+    }
+
+</script>
 <? require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php"); ?>

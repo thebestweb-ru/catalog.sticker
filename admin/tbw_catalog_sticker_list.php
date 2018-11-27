@@ -298,9 +298,9 @@ $lAdmin->AddGroupActionTable(Array(
 ));
 $aContext = array(
     array(
-        "TEXT"=>GetMessage("SEO_META_POST_ADD_TEXT"),
+        "TEXT"=>GetMessage("MAIN_ADD"),
         "LINK"=>"tbw_catalog_sticker_list_item.php?site=".$SITE_ID."&lang=".LANG,
-        "TITLE"=>GetMessage("SEO_META_POST_ADD_TITLE"),
+        "TITLE"=>GetMessage("MAIN_ADD"),
         "ICON"=>"btn_new",
     ),
 );
