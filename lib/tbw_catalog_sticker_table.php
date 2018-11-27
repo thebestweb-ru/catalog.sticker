@@ -12,83 +12,46 @@ class ListTable extends Entity\DataManager
     }
 
     /**
-     * Returns validators for SITE_ID field.
-     *
      * @return array
+     * @throws Main\ObjectException
+     * @throws Main\SystemException
      */
-    public static function validateSiteId()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 3),
-        );
-    }
-    /**
-     * Returns validators for SEND_TO_CRM field.
-     *
-     * @return array
-     */
-    public static function validateSendToCrm()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 1),
-        );
-    }
-    /**
-     * Returns validators for WISHLIST_CODE field.
-     *
-     * @return array
-     */
-    public static function validateWishlistCode()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 255),
-        );
-    }
-
     public static function getMap()
     {
-        return array(
-            new Entity\IntegerField('ID', array(
+        return [
+            new Entity\IntegerField('ID', [
                 'primary' => true,
-                'autocomplete' => true
-            )),
+                'autocomplete' => true,
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            ]),
             new Entity\StringField('SITE_ID', [
                 'required' => true,
-                'validation' => array(__CLASS__, 'validateSiteId'),
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(null, 3),
+                    );
+                },
             ]),
-            new Entity\IntegerField('USER_ID',[
-            'save_data_modification' => function () {
-                return array(
-                    function ($value) {
-                        return (int) $value;
-                    }
-                );
-            },
-            'fetch_data_modification' => function () {
-                return array(
-                    function ($value) {
-                        return (int) $value;
-                    }
-                );
-            }]),
-            new Entity\StringField('USER_NAME'),
-            new Entity\StringField('USER_EMAIL'),
-            new Entity\StringField('USER_PHONE'),
-            new Entity\StringField('SEND_TO_CRM',[
-                'validation' => array(__CLASS__, 'validateSendToCrm'),
-            ]),
-            new Entity\StringField('SEND_TO_EMAIL',[
-                'validation' => array(__CLASS__, 'validateSendToCrm'),
-            ]),
-            new Entity\StringField('WISHLIST_CODE',[
-                'validation' => array(__CLASS__, 'validateWishlistCode'),
-            ]),
-            new Entity\DateTimeField('DATE_CREATE', [
-                'default_value' => new  Main\Type\DateTime,
+            new Entity\IntegerField('NAME',[
                 'required' => true,
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(3, 255),
+                    );
+                },
             ]),
-            new Entity\DateTimeField('DATE_CHANGE', [
-                'default_value' => new  Main\Type\DateTime,
+            new Entity\StringField('DATE_START',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Date(),
+                    );
+                },
                 'save_data_modification' => function () {
                     return [
                         function ($value) {
@@ -97,23 +60,66 @@ class ListTable extends Entity\DataManager
                     ];
                 },
             ]),
-            new Entity\TextField('ITEMS', [
+            new Entity\StringField('DATE_END',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Date(),
+                    );
+                },
                 'save_data_modification' => function () {
                     return [
                         function ($value) {
-                            return json_encode($value,JSON_UNESCAPED_UNICODE);
+                            return new  Main\Type\DateTime;
                         }
                     ];
                 },
+            ]),
+            new Entity\StringField('ACTIVE',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(null, 1),
+                    );
+                },
+            ]),
+            new Entity\StringField('SORT',[
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                },
                 'fetch_data_modification' => function () {
-                    return [
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            ]),
+            new Entity\StringField('TYPE',[
+                'required' => true,
+            ]),
+            new Entity\StringField('TYPE_OPTIONS',[
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return json_encode($value,JSON_UNESCAPED_UNICODE);
+                        }
+                    );
+                },
+                'fetch_data_modification' => function () {
+                    return array(
                         function ($value) {
                             return json_decode(htmlspecialchars_decode($value),true);
                         }
-                    ];
+                    );
                 }
             ]),
-        );
+            new Entity\DateTimeField('LIST_SECTIONS_ID', [
+                'required' => true,
+            ]),
+        ];
     }
 }
 class ListSectionsTable extends Main\Entity\DataManager
@@ -129,86 +135,8 @@ class ListSectionsTable extends Main\Entity\DataManager
     }
 
     /**
-     * Returns validators for SITE_ID field.
-     *
      * @return array
-     */
-    public static function validateSiteId()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 3),
-        );
-    }
-
-    public static function getMap()
-    {
-        return array(
-            new Entity\IntegerField('ID', array(
-                'primary' => true,
-                'autocomplete' => true
-            )),
-            new Entity\StringField('SITE_ID', [
-                'required' => true,
-                'validation' => array(__CLASS__, 'validateSiteId'),
-            ]),
-            new Entity\TextField('SETTINGS', [
-                'save_data_modification' => function () {
-                    return [
-                        function ($value) {
-                            return json_encode($value,JSON_UNESCAPED_UNICODE);
-                        }
-                    ];
-                },
-                'fetch_data_modification' => function () {
-                    return [
-                        function ($value) {
-                            return json_decode(htmlspecialchars_decode($value),true);
-                        }
-                    ];
-                }
-            ])
-        );
-    }
-}
-class ItemTable extends Main\Entity\DataManager
-{
-    /**
-     * Returns DB table name for entity.
-     *
-     * @return string
-     */
-    public static function getTableName()
-    {
-        return 'tbw_catalog_sticker_item';
-    }
-
-    /**
-     * Returns validators for IBLOCK_ID field.
-     *
-     * @return array
-     */
-    public static function validateIblockId()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 11),
-        );
-    }
-    /**
-     * Returns validators for ELEMENT_ID field.
-     *
-     * @return array
-     */
-    public static function validateElementId()
-    {
-        return array(
-            new Main\Entity\Validator\Length(null, 11),
-        );
-    }
-
-    /**
-     * Returns entity map definition.
-     *
-     * @return array
+     * @throws Main\SystemException
      */
     public static function getMap()
     {
@@ -224,9 +152,100 @@ class ItemTable extends Main\Entity\DataManager
                     );
                 }
             )),
-            new Entity\IntegerField('IBLOCK_ID', [
+            new Entity\StringField('LIST_ID', array(
                 'required' => true,
-                'validation' => array(__CLASS__, 'validateIblockId'),
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            )),
+            new Entity\StringField('IBLOCK_ID', array(
+                'required' => true,
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            )),
+            new Entity\StringField('SECTION_ID', array(
+                'required' => true,
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            )),
+            new Entity\StringField('TROUGHT_SECTION', array(
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(null, 1),
+                    );
+                },
+            )),
+        );
+    }
+}
+class ItemTable extends Main\Entity\DataManager
+{
+    /**
+     * Returns DB table name for entity.
+     *
+     * @return string
+     */
+    public static function getTableName()
+    {
+        return 'tbw_catalog_sticker_item';
+    }
+
+
+    /**
+     * @return array
+     * @throws Main\SystemException
+     */
+    public static function getMap()
+    {
+        return array(
+            new Entity\IntegerField('ID', array(
+                'primary' => true,
+                'autocomplete' => true,
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return intval($value);
+                        }
+                    );
+                }
+            )),
+            new Entity\IntegerField('LIST_ID', [
+                'required' => true,
                 'save_data_modification' => function () {
                     return array(
                         function ($value) {
@@ -242,9 +261,49 @@ class ItemTable extends Main\Entity\DataManager
                     );
                 }
             ]),
-            new Entity\IntegerField('ELEMENT_ID', [
+            new Entity\IntegerField('NAME', [
                 'required' => true,
-                'validation' => array(__CLASS__, 'validateElementId'),
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(3, 255),
+                    );
+                },
+            ]),new Entity\StringField('DATE_START',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Date(),
+                    );
+                },
+                'save_data_modification' => function () {
+                    return [
+                        function ($value) {
+                            return new  Main\Type\DateTime;
+                        }
+                    ];
+                },
+            ]),
+            new Entity\StringField('DATE_END',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Date(),
+                    );
+                },
+                'save_data_modification' => function () {
+                    return [
+                        function ($value) {
+                            return new  Main\Type\DateTime;
+                        }
+                    ];
+                },
+            ]),
+            new Entity\StringField('ACTIVE',[
+                'validation' => function () {
+                    return array(
+                        new Main\Entity\Validator\Length(null, 1),
+                    );
+                },
+            ]),
+            new Entity\StringField('SORT',[
                 'save_data_modification' => function () {
                     return array(
                         function ($value) {
@@ -259,7 +318,26 @@ class ItemTable extends Main\Entity\DataManager
                         }
                     );
                 }
-            ])
+            ]),
+            new Entity\StringField('TYPE',[
+                'required' => true,
+            ]),
+            new Entity\StringField('TYPE_OPTIONS',[
+                'save_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return json_encode($value,JSON_UNESCAPED_UNICODE);
+                        }
+                    );
+                },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            return json_decode(htmlspecialchars_decode($value),true);
+                        }
+                    );
+                }
+            ]),
         );
     }
 }
