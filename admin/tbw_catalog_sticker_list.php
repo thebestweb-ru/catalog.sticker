@@ -1,6 +1,7 @@
-<?use \Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Loader;
-use \Oceandevelop\Wishlist\WishlistProListTable;
+<?
+use Bitrix\Main\Localization\Loc,
+    Bitrix\Main\Loader,
+    TheBestWeb\CatalogSticker\ListTable;
 
 require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -8,34 +9,38 @@ Loc::loadMessages(__FILE__);
 
 global $USER, $APPLICATION, $DB;
 
-$module_id = 'oceandevelop.wishlist';
+$MODULE_ID = 'thebestweb.catalog.sticker';
+$MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 
-if (!Loader::includeModule($module_id))
+if (!Loader::includeModule($MODULE_ID))
 {
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_NOT_INSTALL"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_INSTALL"));
     return false;
 }
 
 if (!Loader::includeModule('iblock'))
 {
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_IBLOCK_NOT_INSTALL"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_IBLOCK_NOT_INSTALL"));
     return false;
 }
 
-$POST_RIGHT = $APPLICATION->GetGroupRight($module_id);
+$POST_RIGHT = $APPLICATION->GetGroupRight($MODULE_ID);
 if($POST_RIGHT=="D")
-    $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
+    $APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
 
-$sTableID=WishlistProListTable::getTableName();
+
+
+
+$sTableID=ListTable::getTableName();
 
 $SITE_ID=$_REQUEST['site'] ? $_REQUEST['site'] : null;
 if(!$SITE_ID){
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_NOT_FIND_SITE_ID"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_SITE_ID"));
     return false;
 }
 $rsSites = CSite::GetList($by = "sort", $order = "desc", Array("ACTIVE" => "Y",'LID'=>$SITE_ID));
 if (!$arSite = $rsSites->Fetch()) {
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_NOT_FIND_SITE_ID"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_SITE_ID"));
     return false;
 }
 
@@ -59,6 +64,9 @@ if(count($arSites)<=1){
 unset($rsSites);
 unset($arSite);
 
+
+
+
 $by=$_REQUEST['by'] ? $_REQUEST['by'] : "ID";
 $order=$_REQUEST['order'] ? $_REQUEST['order'] :  "desc";
 
@@ -75,35 +83,29 @@ function CheckFilter()
 {
     global $FilterArr, $lAdmin;
     foreach ($FilterArr as $f) global $$f;
-
-    // В данном случае проверять нечего.
-    // В общем случае нужно проверять значения переменных $find_имя
-    // и в случае возниконовения ошибки передавать ее обработчику
-    // посредством $lAdmin->AddFilterError('текст_ошибки').
-
-    return count($lAdmin->arFilterErrors)==0; // если ошибки есть, вернем false;
+    return count($lAdmin->arFilterErrors)==0;
 }
 // *********************** /CheckFilter ******************************* //
 
 // опишем элементы фильтра
 $FilterArr = Array(
-    "find_id",
     'find_site_id',
-    "find_user_id",
-    "find_user_email",
-    "find_wishlist_code",
-    "find_send_to_crm",
-    "find_send_to_email",
+    "find_name",
+    "find_date_start",
+    "find_date_end",
+    "find_active",
 );
 
 
 // инициализируем фильтр
 $lAdmin->InitFilter($FilterArr);
-
+$arFilter=array();
 // если все значения фильтра корректны, обработаем его
 if (CheckFilter())
 {
     $arFilter = Array();
+    if(!empty($find_id))
+        $arFilter["ID"]=$find_id;
 
     if(count($arSites)<=1){
         if(!empty($find_site_id))
@@ -113,25 +115,23 @@ if (CheckFilter())
         $arFilter["SITE_ID"]=$SITE_ID;
     }
 
-    if(!empty($find_id))
-        $arFilter["ID"]=$find_id;
+    if(!empty($find_name))
+        $arFilter["NAME"]=$find_name;
 
-    if(!empty($find_user_id))
-        $arFilter["USER_ID"]=$find_user_id;
+    if(!empty($find_date_start))
+        $arFilter["DATE_START"]=$find_date_start;
 
-    if(!empty($find_user_email))
-        $arFilter["USER_EMAIL"]=$find_user_email;
+    if(!empty($find_date_end))
+        $arFilter["DATE_END"]=$find_date_end;
 
-    if(!empty($find_wishlist_code))
-        $arFilter["WISHLIST_CODE"]=$find_wishlist_code;
+    if(!empty($find_active))
+        $arFilter["ACTIVE"]=$find_active;
 
-    if(!empty($find_send_to_crm))
-        $arFilter["SEND_TO_CRM"]=$find_send_to_crm;
-
-    if(!empty($find_send_to_email))
-        $arFilter["SEND_TO_EMAIL"]=$find_send_to_email;
-
-
+    if(empty($arFilter['ID'])) unset($arFilter['ID']);
+    if(empty($arFilter['NAME'])) unset($arFilter['NAME']);
+    if(empty($arFilter['ACTIVE'])) unset($arFilter['ACTIVE']);
+    if(empty($arFilter['DATE_START'])) unset($arFilter['DATE_START']);
+    if(empty($arFilter['DATE_END'])) unset($arFilter['DATE_END']);
 }
 
 
@@ -146,7 +146,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
             'order'=>array($by=>$order)
         );
 
-        $rsData = WishlistProListTable::getList($parametrs);
+        $rsData = ListTable::getList($parametrs);
         while($arRes = $rsData->Fetch())
             $arID[] = $arRes['ID'];
     }
@@ -165,13 +165,24 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
             case "delete":
                 @set_time_limit(0);
                 $DB->StartTransaction();
-                $result = WishlistProListTable::delete($ID);
+                $result = ListTable::delete($ID);
                 if (!$result->isSuccess())
                 {
                     $DB->Rollback();
-                    $lAdmin->AddGroupError(GetMessage("MODULE_WISHLIST_LIST_DEL_ERROR"), $ID);
+                    $lAdmin->AddGroupError(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DEL_ERROR"), $ID);
                 }
                 $DB->Commit();
+                break;
+            case "activate":
+            case "deactivate":
+                $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 1 : 0);
+
+                    $result = ListTable::update($ID, array(
+                        'ACTIVE' => $arFields["ACTIVE"],
+                    ));
+                    if (!$result->isSuccess())
+                        $lAdmin->AddGroupError(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SAVE_ERROR"), $ID);
+
                 break;
         }
     }
@@ -182,18 +193,14 @@ $parametrs=array(
     'filter' => $arFilter,
     'order'=>array($by=>$order)
 );
-$rsData = WishlistProListTable::getList($parametrs);
+$rsData = ListTable::getList($parametrs);
 
 // преобразуем список в экземпляр класса CAdminResult
 $rsData = new CAdminResult($rsData, $sTableID);
-
-
-
 // аналогично CDBResult инициализируем постраничную навигацию.
 $rsData->NavStart();
-
 // отправим вывод переключателя страниц в основной объект $lAdmin
-$lAdmin->NavText($rsData->GetNavPrint(GetMessage("MODULE_WISHLIST_LIST_NAV")));
+$lAdmin->NavText($rsData->GetNavPrint(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAV")));
 
 $lAdmin->AddHeaders(array(
     array(  "id"    =>"ID",
@@ -203,41 +210,38 @@ $lAdmin->AddHeaders(array(
         "default"  =>true,
     ),
     array(  "id"    =>"SITE_ID",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_SITE_ID"),
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID"),
         "sort"    =>"SITE_ID",
         "default"  =>true,
     ),
-    array(  "id"    =>"DATE_CREATE",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_DATE_CREATE"),
-        "sort"    =>"DATE_CREATE",
+    array(  "id"    =>"NAME",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAME"),
+        "sort"    =>"NAME",
         "default"  =>true,
     ),
-    array(  "id"    =>"DATE_CHANGE",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_DATE_CHANGE"),
-        "sort"    =>"DATE_CHANGE",
+    array(  "id"    =>"ACTIVE",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIVE"),
+        "sort"    =>"ACTIVE",
         "default"  =>true,
     ),
-    array(  "id"    =>"USER_ID",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_USER_ID"),
-        "sort"    =>"USER_ID",
+    array(  "id"    =>"SORT",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SORT"),
+        "sort"    =>"SORT",
         "default"  =>true,
     ),
-    array(  "id"    =>"USER_EMAIL",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_USER_EMAIL"),
+    array(  "id"    =>"TYPE",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_TYPE"),
+        "sort"    =>"TYPE",
         "default"  =>true,
     ),
-    array(  "id"    =>"SEND_TO_CRM",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_SEND_TO_CRM"),
-        "sort"    =>"SEND_TO_CRM",
+    array(  "id"    =>"DATE_START",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_START"),
+        "sort"    =>"DATE_START",
         "default"  =>true,
     ),
-    array(  "id"    =>"SEND_TO_EMAIL",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_SEND_TO_EMAIL"),
-        "sort"    =>"SEND_TO_CRM",
-        "default"  =>true,
-    ),
-    array(  "id"    =>"WISHLIST_CODE",
-        "content"  =>GetMessage("MODULE_WISHLIST_LIST_WISHLIST_CODE"),
+    array(  "id"    =>"DATE_END",
+        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_END"),
+        "sort"    =>"DATE_END",
         "default"  =>true,
     ),
 
@@ -249,43 +253,28 @@ while($arRes = $rsData->NavNext(true, "f_"))
     $row =& $lAdmin->AddRow($f_ID, $arRes);
 
     $row->AddInputField("ID", array("size"=>40));
-    $row->AddViewField("ID", '<a href="oceandevelop_wishlist_list_edit.php?ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
-    if($f_USER_ID){
-        $row->AddViewField("USER_ID", '<a href="user_edit.php?ID='.$f_USER_ID.'&lang='.LANG.'">'.$f_USER_ID.'</a>');
-    }else{
-        $row->AddViewField("USER_ID", 'Анонимный');
-    }
+    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_list_item.php?ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
 
-    if($f_SEND_TO_CRM){
-        $row->AddViewField("SEND_TO_CRM", 'Да');
-    }else{
-        $row->AddViewField("SEND_TO_CRM", 'Нет');
-    }
+    $row->AddInputField("SORT", array("size"=>20));
 
-    if($f_SEND_TO_EMAIL){
-        $row->AddViewField("SEND_TO_EMAIL", 'Да');
-    }else{
-        $row->AddViewField("SEND_TO_EMAIL", 'Нет');
-    }
+    $row->AddCheckField("ACTIVE");
 
-
-    // сформируем контекстное меню
     $arActions = Array();
 
     // редактирование элемента
     $arActions[] = array(
         "ICON"=>"edit",
         "DEFAULT"=>true,
-        "TEXT"=>GetMessage("MODULE_WISHLIST_LIST_ACTIONS_EDIT"),
-        "ACTION"=>$lAdmin->ActionRedirect("oceandevelop_wishlist_list_edit.php?ID=".$f_ID."&lang=".LANG)
+        "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIONS_EDIT"),
+        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_list_item.php?ID=".$f_ID."&lang=".LANG)
     );
 
     // удаление элемента
     if ($POST_RIGHT>="W")
         $arActions[] = array(
             "ICON"=>"delete",
-            "TEXT"=>GetMessage("MODULE_WISHLIST_LIST_ACTIONS_DEL"),
-            "ACTION"=>"if(confirm('".GetMessage('MODULE_WISHLIST_LIST_ACTIONS_DEL_CONF')."')) ".$lAdmin->ActionDoGroup($f_ID, "delete",'site='.$SITE_ID)
+            "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIONS_DEL"),
+            "ACTION"=>"if(confirm('".Loc::getMessage($MODULE_LANG_PREFIX.'_LIST_ACTIONS_DEL_CONF')."')) ".$lAdmin->ActionDoGroup($f_ID, "delete",'site='.$SITE_ID)
         );
     if(is_set($arActions[count($arActions)-1], "SEPARATOR"))
         unset($arActions[count($arActions)-1]);
@@ -296,24 +285,35 @@ while($arRes = $rsData->NavNext(true, "f_"))
 // резюме таблицы
 $lAdmin->AddFooter(
     array(
-        array("title"=>GetMessage("MAIN_ADMIN_LIST_SELECTED"), "value"=>$rsData->SelectedRowsCount()), // кол-во элементов
-        array("counter"=>true, "title"=>GetMessage("MAIN_ADMIN_LIST_CHECKED"), "value"=>"0"), // счетчик выбранных элементов
+        array("title"=>Loc::getMessage("MAIN_ADMIN_LIST_SELECTED"), "value"=>$rsData->SelectedRowsCount()), // кол-во элементов
+        array("counter"=>true, "title"=>Loc::getMessage("MAIN_ADMIN_LIST_CHECKED"), "value"=>"0"), // счетчик выбранных элементов
     )
 );
 
 // групповые действия
 $lAdmin->AddGroupActionTable(Array(
-    "delete"=>GetMessage("MAIN_ADMIN_LIST_DELETE"), // удалить выбранные элементы
+    "delete"=>Loc::getMessage("MAIN_ADMIN_LIST_DELETE"),
+    "activate" => GetMessage("MAIN_ADMIN_LIST_ACTIVATE"),
+    "deactivate" => GetMessage("MAIN_ADMIN_LIST_DEACTIVATE"),
 ));
+$aContext = array(
+    array(
+        "TEXT"=>GetMessage("SEO_META_POST_ADD_TEXT"),
+        "LINK"=>"tbw_catalog_sticker_list_item.php?site=".$SITE_ID."&lang=".LANG,
+        "TITLE"=>GetMessage("SEO_META_POST_ADD_TITLE"),
+        "ICON"=>"btn_new",
+    ),
+);
 // ******************************************************************** //
 //                ВЫВОД                                                 //
 // ******************************************************************** //
 
+$lAdmin->AddAdminContextMenu($aContext);
 // альтернативный вывод
 $lAdmin->CheckListMode();
 
 // установим заголовок страницы
-$APPLICATION->SetTitle(Loc::getMessage("TITLE"));
+$APPLICATION->SetTitle(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_TITLE"));
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 
@@ -326,12 +326,11 @@ $oFilter = new CAdminFilter(
     $sTableID."_filter",
     array(
         "ID",
-        GetMessage("MODULE_WISHLIST_LIST_SITE_ID"),
-        GetMessage("MODULE_WISHLIST_LIST_USER_ID"),
-        GetMessage("MODULE_WISHLIST_LIST_USER_EMAIL"),
-        GetMessage("MODULE_WISHLIST_LIST_WISHLIST_CODE"),
-        GetMessage("MODULE_WISHLIST_LIST_SEND_TO_CRM"),
-        GetMessage("MODULE_WISHLIST_LIST_SEND_TO_EMAIL"),
+        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID"),
+        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAME"),
+        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_START"),
+        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_END"),
+        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIVE"),
     )
 );
 
@@ -349,70 +348,52 @@ $oFilter = new CAdminFilter(
         </tr>
         <?if(count($arSites)<=1):?>
             <tr>
-                <td><?=GetMessage("MODULE_WISHLIST_LIST_SITE_ID")?>:</td>
+                <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID")?>:</td>
                 <td>
-                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites2), "REFERENCE_ID" => array_keys ($arSites2)), htmlspecialchars($find_site_id), GetMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
+                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites2), "REFERENCE_ID" => array_keys ($arSites2)), htmlspecialchars($find_site_id), Loc::getMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
                 </td>
             </tr>
         <?else:?>
             <tr>
-                <td><?=GetMessage("MODULE_WISHLIST_LIST_SITE_ID")?>:</td>
+                <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID")?>:</td>
                 <td>
-                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites), "REFERENCE_ID" => array_keys ($arSites)), htmlspecialchars($find_site_id), GetMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
+                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites), "REFERENCE_ID" => array_keys ($arSites)), htmlspecialchars($find_site_id), Loc::getMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
                 </td>
             </tr>
         <?endif;?>
         <tr>
-            <td><?=GetMessage("MODULE_WISHLIST_LIST_USER_ID")?>:</td>
+            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAME")?>:</td>
             <td>
-                <input type="text" name="find_user_id" size="47" value="<?echo htmlspecialchars($find_user_id)?>">
+                <input type="text" name="find_name" size="47" value="<?echo htmlspecialchars($find_name)?>">
             </td>
         </tr>
         <tr>
-            <td><?=GetMessage("MODULE_WISHLIST_LIST_USER_EMAIL")?>:</td>
+            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_START")?>:</td>
             <td>
-                <input type="text" name="find_user_email" size="47" value="<?echo htmlspecialchars($find_user_email)?>">
+                <input type="text" name="find_date_start" size="47" value="<?echo htmlspecialchars($find_date_start)?>">
             </td>
         </tr>
         <tr>
-            <td><?=GetMessage("MODULE_WISHLIST_LIST_WISHLIST_CODE")?>:</td>
+            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_END")?>:</td>
             <td>
-                <input type="text" name="find_wishlist_code" size="47" value="<?echo htmlspecialchars($find_wishlist_code)?>">
+                <input type="text" name="find_date_end" size="47" value="<?echo htmlspecialchars($find_date_end)?>">
             </td>
         </tr>
         <tr>
-            <td><?=GetMessage("MODULE_WISHLIST_LIST_SEND_TO_CRM")?>:</td>
+            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIVE")?>:</td>
             <td>
                 <?
                 $arr = array(
                     "reference" => array(
-                        GetMessage("MODULE_WISHLIST_LIST_POST_YES"),
-                        GetMessage("MODULE_WISHLIST_LIST_POST_NO"),
+                        Loc::getMessage("MAIN_YES"),
+                        Loc::getMessage("MAIN_NO"),
                     ),
                     "reference_id" => array(
                         true,
                         false,
                     )
                 );
-                echo SelectBoxFromArray("find_send_to_crm", $arr, $find_send_to_crm, GetMessage("MODULE_WISHLIST_LIST_POST_ALL"), "");
-                ?>
-            </td>
-        </tr>
-        <tr>
-            <td><?=GetMessage("MODULE_WISHLIST_LIST_SEND_TO_EMAIL")?>:</td>
-            <td>
-                <?
-                $arr = array(
-                    "reference" => array(
-                        GetMessage("MODULE_WISHLIST_LIST_POST_YES"),
-                        GetMessage("MODULE_WISHLIST_LIST_POST_NO"),
-                    ),
-                    "reference_id" => array(
-                        true,
-                        false,
-                    )
-                );
-                echo SelectBoxFromArray("find_send_to_email", $arr, $find_send_to_email, GetMessage("MODULE_WISHLIST_LIST_POST_ALL"), "");
+                echo SelectBoxFromArray("find_active", $arr, $find_active, Loc::getMessage("MAIN_ALL"), "");
                 ?>
             </td>
         </tr>
@@ -426,6 +407,4 @@ $oFilter = new CAdminFilter(
 // выведем таблицу списка элементов
 $lAdmin->DisplayList();
 ?>
-
-
 <? require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php"); ?>
