@@ -1,0 +1,5 @@
+<?
+$MESS["TBW_CATALOG_STICKER_ADMIN_MENU_TEXT"] = "TBW Стикеры в каталоге";
+$MESS["TBW_CATALOG_STICKER_ADMIN_MENU_LIST_TEXT"] = "Группы стикеров";
+$MESS["TBW_CATALOG_STICKER_ADMIN_MENU_LIST_TITLE"] = "Группы стикеров";
+?>
