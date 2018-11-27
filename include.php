@@ -1,13 +1,9 @@
 <?
 
-use \Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Application;
-
-Loc::loadMessages(__FILE__);
 
 $module_id = 'thebestweb.catalog.sticker';
 
-IncludeModuleLangFile(__FILE__);
 
 \Bitrix\Main\Loader::registerAutoLoadClasses(
     $module_id,
