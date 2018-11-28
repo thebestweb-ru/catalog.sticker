@@ -38,7 +38,7 @@ class ListTable extends Entity\DataManager
                     );
                 },
             ]),
-            new Entity\IntegerField('NAME',[
+            new Entity\StringField('NAME',[
                 'required' => true,
                 'validation' => function () {
                     return array(
@@ -46,42 +46,48 @@ class ListTable extends Entity\DataManager
                     );
                 },
             ]),
-            new Entity\StringField('DATE_START',[
+            new Entity\DateField('DATE_START',[
+                'data_type' => 'datetime',
                 'validation' => function () {
                     return array(
-                        new Main\Entity\Validator\Date(),
+                        new Entity\Validator\Date()
                     );
                 },
-                'save_data_modification' => function () {
-                    return [
+                'fetch_data_modification' => function () {
+                    return array(
                         function ($value) {
-                            return new  Main\Type\DateTime;
+                            return $value->toString();
                         }
-                    ];
-                },
+                    );
+                }
             ]),
-            new Entity\StringField('DATE_END',[
+            new Entity\DateField('DATE_END',[
+                'data_type' => 'datetime',
                 'validation' => function () {
                     return array(
-                        new Main\Entity\Validator\Date(),
+                         new Entity\Validator\Date()
                     );
                 },
-                'save_data_modification' => function () {
-                    return [
+                'fetch_data_modification' => function () {
+                    return array(
                         function ($value) {
-                            return new  Main\Type\DateTime;
+                            return $value->toString();
                         }
-                    ];
-                },
+                    );
+                }
             ]),
             new Entity\StringField('ACTIVE',[
+                'data_type' => 'boolean',
+                'values' => array('N','Y'),
+                'default_value' => 'Y',
                 'validation' => function () {
                     return array(
                         new Main\Entity\Validator\Length(null, 1),
                     );
                 },
             ]),
-            new Entity\StringField('SORT',[
+            new Entity\IntegerField('SORT',[
+                'default_value' => 500,
                 'save_data_modification' => function () {
                     return array(
                         function ($value) {
@@ -116,9 +122,6 @@ class ListTable extends Entity\DataManager
                     );
                 }
             ]),
-            new Entity\DateTimeField('LIST_SECTIONS_ID', [
-                'required' => true,
-            ]),
         ];
     }
 }
@@ -152,7 +155,7 @@ class ListSectionsTable extends Main\Entity\DataManager
                     );
                 }
             )),
-            new Entity\StringField('LIST_ID', array(
+            new Entity\IntegerField('LIST_ID', array(
                 'required' => true,
                 'save_data_modification' => function () {
                     return array(
@@ -169,7 +172,7 @@ class ListSectionsTable extends Main\Entity\DataManager
                     );
                 }
             )),
-            new Entity\StringField('IBLOCK_ID', array(
+            new Entity\IntegerField('IBLOCK_ID', array(
                 'required' => true,
                 'save_data_modification' => function () {
                     return array(
@@ -186,7 +189,7 @@ class ListSectionsTable extends Main\Entity\DataManager
                     );
                 }
             )),
-            new Entity\StringField('SECTION_ID', array(
+            new Entity\IntegerField('SECTION_ID', array(
                 'required' => true,
                 'save_data_modification' => function () {
                     return array(
@@ -268,12 +271,8 @@ class ItemTable extends Main\Entity\DataManager
                         new Main\Entity\Validator\Length(3, 255),
                     );
                 },
-            ]),new Entity\StringField('DATE_START',[
-                'validation' => function () {
-                    return array(
-                        new Main\Entity\Validator\Date(),
-                    );
-                },
+            ]),
+            new Entity\StringField('DATE_START',[
                 'save_data_modification' => function () {
                     return [
                         function ($value) {
@@ -283,11 +282,6 @@ class ItemTable extends Main\Entity\DataManager
                 },
             ]),
             new Entity\StringField('DATE_END',[
-                'validation' => function () {
-                    return array(
-                        new Main\Entity\Validator\Date(),
-                    );
-                },
                 'save_data_modification' => function () {
                     return [
                         function ($value) {

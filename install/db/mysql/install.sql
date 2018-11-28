@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS `tbw_catalog_sticker_list`
   `SORT` int(11) DEFAULT '500',
   `TYPE` varchar(255) NOT NULL,
   `TYPE_OPTIONS` TEXT DEFAULT NULL,
-  `LIST_SECTIONS_ID` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
 );
 CREATE TABLE IF NOT EXISTS `tbw_catalog_sticker_list_sections`
@@ -35,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `tbw_catalog_sticker_item`
   PRIMARY KEY (`ID`)
 );
 
-ALTER TABLE tbw_catalog_sticker_list
-   ADD FOREIGN KEY (`LIST_SECTIONS_ID`) REFERENCES tbw_catalog_sticker_list_sections (`ID`);
+ALTER TABLE tbw_catalog_sticker_list_sections
+   ADD FOREIGN KEY (`LIST_ID`) REFERENCES tbw_catalog_sticker_list (`ID`);
 ALTER TABLE tbw_catalog_sticker_item
    ADD FOREIGN KEY (`LIST_ID`) REFERENCES tbw_catalog_sticker_list (`ID`);

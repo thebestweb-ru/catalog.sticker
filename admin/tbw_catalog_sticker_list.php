@@ -253,7 +253,7 @@ while($arRes = $rsData->NavNext(true, "f_"))
     $row =& $lAdmin->AddRow($f_ID, $arRes);
 
     $row->AddInputField("ID", array("size"=>40));
-    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_list_item.php?ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
+    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_list_item.php?site='.$SITE_ID.'&ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
 
     $row->AddInputField("SORT", array("size"=>20));
 
@@ -266,7 +266,7 @@ while($arRes = $rsData->NavNext(true, "f_"))
         "ICON"=>"edit",
         "DEFAULT"=>true,
         "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIONS_EDIT"),
-        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_list_item.php?ID=".$f_ID."&lang=".LANG)
+        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_list_item.php?site='.$SITE_ID.'&ID=".$f_ID."&lang=".LANG)
     );
 
     // удаление элемента
