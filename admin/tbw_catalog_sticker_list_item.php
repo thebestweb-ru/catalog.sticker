@@ -269,7 +269,7 @@ if(
         $bVarsFromForm = true;
     }
 }
-$default_type_keys=array_keys (CatalogSticker::GetTypeStickers());
+$default_type_keys=array_keys (CatalogSticker::GetTypeGroupStickers());
 $default_type=$default_type_keys[0];
 
 // выборка данных
@@ -347,7 +347,7 @@ if($message)
             <td><span class="required">*</span><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_TYPE")?></td>
             <td>
                 <?
-                echo SelectBoxFromArray("TYPE", array("REFERENCE" => array_values (CatalogSticker::GetTypeStickers()), "REFERENCE_ID" => array_keys (CatalogSticker::GetTypeStickers())),$Item['TYPE'],'','onchange="ChangeTypeOptions(this.value)"');
+                echo SelectBoxFromArray("TYPE", array("REFERENCE" => array_values (CatalogSticker::GetTypeGroupStickers()), "REFERENCE_ID" => array_keys (CatalogSticker::GetTypeGroupStickers())),$Item['TYPE'],'','onchange="ChangeTypeOptions(this.value)"');
                 ?>
             </td>
         </tr>

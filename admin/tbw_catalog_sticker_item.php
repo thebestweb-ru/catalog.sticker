@@ -1,7 +1,9 @@
 <?
-use \Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Loader;
-use \Oceandevelop\Wishlist\WishlistProListTable;
+use Bitrix\Main\Localization\Loc,
+    Bitrix\Main\Loader,
+    Bitrix\Main\Type,
+    TheBestWeb\CatalogSticker,
+    TheBestWeb\CatalogSticker\ItemTable;
 
 require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -9,17 +11,18 @@ Loc::loadMessages(__FILE__);
 
 global $USER, $APPLICATION, $DB;
 
-$module_id = 'oceandevelop.wishlist';
+$MODULE_ID = 'thebestweb.catalog.sticker';
+$MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 
-
-if (!Loader::includeModule($module_id))
+if (!Loader::includeModule($MODULE_ID))
 {
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_NOT_INSTALL"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_INSTALL"));
     return false;
 }
+
 if (!Loader::includeModule('iblock'))
 {
-    $APPLICATION->ThrowException(GetMessage("MODULE_WISHLIST_IBLOCK_NOT_INSTALL"));
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_IBLOCK_NOT_INSTALL"));
     return false;
 }
 
@@ -27,13 +30,17 @@ $POST_RIGHT = $APPLICATION->GetGroupRight($module_id);
 if($POST_RIGHT=="D")
     $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 
-$sTableID=WishlistProListTable::getTableName();
 
 
-$aTabs[]=array("DIV" => "edit1", "TAB" => GetMessage("MODULE_WISHLIST_TAB"), "ICON"=>"main_user_edit", "TITLE"=>GetMessage("MODULE_WISHLIST_TAB"));
+$sTableID=ItemTable::getTableName();
+
+$aTabs[]=array("DIV" => "edit1", "TAB" => Loc::getMessage($MODULE_LANG_PREFIX."_TAB_MAIN"), "ICON"=>"main_user_edit", "TITLE"=>Loc::getMessage($MODULE_LANG_PREFIX."_TAB_MAIN"));
 $tabControl = new CAdminTabControl("tabControl", $aTabs);
 
 $ID = intval($ID);
+$message = null;		// сообщение об ошибке
+$bVarsFromForm = false; // флаг "Данные получены с формы", обозначающий, что выводимые данные получены с формы, а не из БД.
+
 
 // выборка данных
 if($ID>0)

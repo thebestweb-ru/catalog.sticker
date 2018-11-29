@@ -5,7 +5,7 @@ namespace TheBestWeb;
 class CatalogSticker
 {
 
-    public function GetTypeStickers(){
+    public function GetTypeGroupStickers(){
         return array(
             'POSITIONS'=>'Позиционное',
             'FIXED'=>'Фиксированное',
