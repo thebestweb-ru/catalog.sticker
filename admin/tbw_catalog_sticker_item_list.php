@@ -1,7 +1,8 @@
 <?
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
-    TheBestWeb\CatalogSticker\ListTable;
+    TheBestWeb\CatalogSticker\ListTable,
+    TheBestWeb\CatalogSticker\ItemTable;
 
 require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -28,10 +29,6 @@ $POST_RIGHT = $APPLICATION->GetGroupRight($MODULE_ID);
 if($POST_RIGHT=="D")
     $APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
 
-
-
-
-$sTableID=ListTable::getTableName();
 
 $SITE_ID=$_REQUEST['site'] ? $_REQUEST['site'] : null;
 if(!$SITE_ID){
@@ -65,7 +62,21 @@ unset($rsSites);
 unset($arSite);
 
 
+$ID = intval($ID);
 
+$rsStickerGroup = ListTable::GetList(Array("filter" => ['ID'=>$ID,'SITE_ID'=>$SITE_ID]));
+if (!$arStickerGroup = $rsStickerGroup->Fetch()) {
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_LIST_GROUP"));
+    return false;
+}
+
+/** @global CAdminMainChain $adminChain */
+$adminChain->AddItem(array(
+    "TEXT" => htmlspecialcharsex($arStickerGroup["NAME"]),
+    "LINK" => "tbw_catalog_sticker_list.php?site=".$SITE_ID."&lang=".LANG,
+));
+
+$sTableID=ItemTable::getTableName();
 
 $by=$_REQUEST['by'] ? $_REQUEST['by'] : "ID";
 $order=$_REQUEST['order'] ? $_REQUEST['order'] :  "desc";
@@ -89,7 +100,6 @@ function CheckFilter()
 
 // опишем элементы фильтра
 $FilterArr = Array(
-    'find_site_id',
     "find_name",
     "find_date_start",
     "find_date_end",
@@ -106,14 +116,6 @@ if (CheckFilter())
     $arFilter = Array();
     if(!empty($find_id))
         $arFilter["ID"]=$find_id;
-
-    if(count($arSites)<=1){
-        if(!empty($find_site_id))
-            $arFilter["SITE_ID"]=$find_site_id;
-    }else{
-        $find_site_id=$SITE_ID;
-        $arFilter["SITE_ID"]=$SITE_ID;
-    }
 
     if(!empty($find_name))
         $arFilter["NAME"]=$find_name;
@@ -134,6 +136,7 @@ if (CheckFilter())
     if(empty($arFilter['DATE_END'])) unset($arFilter['DATE_END']);
 }
 
+$arFilter['LIST_ID']=$ID;
 
 // обработка одиночных и групповых действий
 if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
@@ -146,7 +149,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
             'order'=>array($by=>$order)
         );
 
-        $rsData = ListTable::getList($parametrs);
+        $rsData = ItemTable::getList($parametrs);
         while($arRes = $rsData->Fetch())
             $arID[] = $arRes['ID'];
     }
@@ -165,7 +168,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
             case "delete":
                 @set_time_limit(0);
                 $DB->StartTransaction();
-                $result = ListTable::delete($ID);
+                $result = ItemTable::delete($ID);
                 if (!$result->isSuccess())
                 {
                     $DB->Rollback();
@@ -177,7 +180,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
             case "deactivate":
                 $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 1 : 0);
 
-                    $result = ListTable::update($ID, array(
+                    $result = ItemTable::update($ID, array(
                         'ACTIVE' => $arFields["ACTIVE"],
                     ));
                     if (!$result->isSuccess())
@@ -193,7 +196,7 @@ $parametrs=array(
     'filter' => $arFilter,
     'order'=>array($by=>$order)
 );
-$rsData = ListTable::getList($parametrs);
+$rsData = ItemTable::getList($parametrs);
 
 // преобразуем список в экземпляр класса CAdminResult
 $rsData = new CAdminResult($rsData, $sTableID);
@@ -207,11 +210,6 @@ $lAdmin->AddHeaders(array(
         "content"  =>"ID",
         "sort"    =>"ID",
         "align"    =>"right",
-        "default"  =>true,
-    ),
-    array(  "id"    =>"SITE_ID",
-        "content"  =>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID"),
-        "sort"    =>"SITE_ID",
         "default"  =>true,
     ),
     array(  "id"    =>"NAME",
@@ -253,28 +251,21 @@ while($arRes = $rsData->NavNext(true, "f_"))
     $row =& $lAdmin->AddRow($f_ID, $arRes);
 
     $row->AddInputField("ID", array("size"=>40));
-    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item_list.php?site='.$SITE_ID.'&ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
+    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item.php?site='.$SITE_ID.'&ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
 
     $row->AddInputField("SORT", array("size"=>20));
 
     $row->AddCheckField("ACTIVE");
 
     $arActions = Array();
-    // редактирование элемента
-    $arActions[] = array(
-        "ICON"=>"view",
-        "DEFAULT"=>true,
-        "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_ITEM_LIST"),
-        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item_list.php?site=".$SITE_ID."&ID=".$f_ID."&lang=".LANG)
-    );
+
     // редактирование элемента
     $arActions[] = array(
         "ICON"=>"edit",
-        "DEFAULT"=>false,
+        "DEFAULT"=>true,
         "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIONS_EDIT"),
-        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_list_item.php?site=".$SITE_ID."&ID=".$f_ID."&lang=".LANG)
+        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item.php?site=".$SITE_ID."&ID=".$f_ID."&lang=".LANG)
     );
-
 
     // удаление элемента
     if ($POST_RIGHT>="W")
@@ -305,8 +296,13 @@ $lAdmin->AddGroupActionTable(Array(
 ));
 $aContext = array(
     array(
+        "TEXT" => Loc::getMessage($MODULE_LANG_PREFIX."_BACK_LIST"),
+        "LINK" => "tbw_catalog_sticker_list.php?site=".$SITE_ID."&lang=".LANG,
+        "ICON" => "btn_list",
+    ),
+    array(
         "TEXT"=>GetMessage("MAIN_ADD"),
-        "LINK"=>"tbw_catalog_sticker_list_item.php?site=".$SITE_ID."&lang=".LANG,
+        "LINK"=>"tbw_catalog_sticker_item.php?site=".$SITE_ID."&lang=".LANG,
         "TITLE"=>GetMessage("MAIN_ADD"),
         "ICON"=>"btn_new",
     ),
@@ -320,9 +316,10 @@ $lAdmin->AddAdminContextMenu($aContext);
 $lAdmin->CheckListMode();
 
 // установим заголовок страницы
-$APPLICATION->SetTitle(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_TITLE"));
+$APPLICATION->SetTitle(Loc::getMessage($MODULE_LANG_PREFIX."_LIST_TITLE",array('#TITLE#'=>$arStickerGroup['NAME'])));
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
+
 
 // ******************************************************************** //
 //                ВЫВОД ФИЛЬТРА                                         //
@@ -333,7 +330,6 @@ $oFilter = new CAdminFilter(
     $sTableID."_filter",
     array(
         "ID",
-        Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID"),
         Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAME"),
         Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_START"),
         Loc::getMessage($MODULE_LANG_PREFIX."_LIST_DATE_END"),
@@ -353,21 +349,6 @@ $oFilter = new CAdminFilter(
                 <input type="text" name="find_id" size="47" value="<?echo htmlspecialchars($find_id)?>">
             </td>
         </tr>
-        <?if(count($arSites)<=1):?>
-            <tr>
-                <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID")?>:</td>
-                <td>
-                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites2), "REFERENCE_ID" => array_keys ($arSites2)), htmlspecialchars($find_site_id), Loc::getMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
-                </td>
-            </tr>
-        <?else:?>
-            <tr>
-                <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_SITE_ID")?>:</td>
-                <td>
-                    <? echo SelectBoxFromArray("find_site_id", array("REFERENCE" => array_keys ($arSites), "REFERENCE_ID" => array_keys ($arSites)), htmlspecialchars($find_site_id), Loc::getMessage("POST_ALL"), "".(count($arSites)<=1 ? '' : 'disabled'));?>
-                </td>
-            </tr>
-        <?endif;?>
         <tr>
             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_LIST_NAME")?>:</td>
             <td>

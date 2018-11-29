@@ -46,7 +46,7 @@ if ($APPLICATION->GetGroupRight($iModuleID) != "D") {
         "text" => Loc::getMessage($iModuleLangID."_ADMIN_MENU_TEXT"),
         "title" => Loc::getMessage($iModuleLangID."_ADMIN_MENU_TEXT"),
         "items" => array($Lists),
-        "more_url"=> array("tbw_catalog_sticker_list_item.php","tbw_catalog_sticker_item.php"),
+        "more_url"=> array("tbw_catalog_sticker_list_item.php","tbw_catalog_sticker_item.php","tbw_catalog_sticker_item_list.php"),
     );
     return $aMenu;
 }
