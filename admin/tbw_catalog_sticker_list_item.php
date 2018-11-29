@@ -189,8 +189,8 @@ if(
     $arFields = Array(
         "SITE_ID"=> $SITE_ID,
         "NAME"=> $NAME,
-        "DATE_START"=> new Type\DateTime($DATE_START),
-        "DATE_END"=> new Type\DateTime($DATE_END),
+        "DATE_START"=> '',
+        "DATE_END"=> '',
         "ACTIVE"=> $ACTIVE=='Y'?'Y':'',
         "TYPE"=> $TYPE,
         "TYPE_OPTIONS"=> $TYPE_OPTIONS,
@@ -198,6 +198,12 @@ if(
 
     if(!empty($SORT))
         $arFields['SORT']=intval($SORT);
+
+    if(!empty($DATE_START))
+        $arFields['DATE_START']=new Type\DateTime($DATE_START);
+
+    if(!empty($DATE_END))
+        $arFields['DATE_END']=new Type\DateTime($DATE_END);
 
     if(!$message){
         // сохранение данных
@@ -407,7 +413,7 @@ if($message)
         $tabControl->Buttons(
             array(
                 "disabled"=>($POST_RIGHT<"W"),
-                "back_url"=>"rubric_admin.php?lang=".LANG,
+                "back_url"=>"tbw_catalog_sticker_list.php?lang=".LANG."&site=".$SITE_ID,
             )
         );
         // завершаем интерфейс закладки

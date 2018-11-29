@@ -12,4 +12,12 @@ class CatalogSticker
             'FIXED_POSITIONS'=>'Фиксированное чередование',
         );
     }
+    public function GetTypeStickers(){
+        return array(
+            'HTML'=>'HTML Блок',
+            'PICTURE'=>'Картинка',
+            'VIDEO'=>'Видео',
+            'PRODUCT'=>'Товар',
+        );
+    }
 }

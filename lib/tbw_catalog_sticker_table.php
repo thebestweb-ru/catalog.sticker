@@ -56,7 +56,10 @@ class ListTable extends Entity\DataManager
                 'fetch_data_modification' => function () {
                     return array(
                         function ($value) {
-                            return $value->toString();
+                            if($value)
+                                return $value->toString();
+
+                            return $value;
                         }
                     );
                 }
@@ -71,7 +74,10 @@ class ListTable extends Entity\DataManager
                 'fetch_data_modification' => function () {
                     return array(
                         function ($value) {
-                            return $value->toString();
+                            if($value)
+                                return $value->toString();
+
+                            return $value;
                         }
                     );
                 }
@@ -264,7 +270,7 @@ class ItemTable extends Main\Entity\DataManager
                     );
                 }
             ]),
-            new Entity\IntegerField('NAME', [
+            new Entity\StringField('NAME', [
                 'required' => true,
                 'validation' => function () {
                     return array(
@@ -272,23 +278,41 @@ class ItemTable extends Main\Entity\DataManager
                     );
                 },
             ]),
-            new Entity\StringField('DATE_START',[
-                'save_data_modification' => function () {
-                    return [
-                        function ($value) {
-                            return new  Main\Type\DateTime;
-                        }
-                    ];
+            new Entity\DateField('DATE_START',[
+                'data_type' => 'datetime',
+                'validation' => function () {
+                    return array(
+                        new Entity\Validator\Date()
+                    );
                 },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            if($value)
+                                return $value->toString();
+
+                            return $value;
+                        }
+                    );
+                }
             ]),
-            new Entity\StringField('DATE_END',[
-                'save_data_modification' => function () {
-                    return [
-                        function ($value) {
-                            return new  Main\Type\DateTime;
-                        }
-                    ];
+            new Entity\DateField('DATE_END',[
+                'data_type' => 'datetime',
+                'validation' => function () {
+                    return array(
+                        new Entity\Validator\Date()
+                    );
                 },
+                'fetch_data_modification' => function () {
+                    return array(
+                        function ($value) {
+                            if($value)
+                                return $value->toString();
+
+                            return $value;
+                        }
+                    );
+                }
             ]),
             new Entity\StringField('ACTIVE',[
                 'validation' => function () {
@@ -297,7 +321,7 @@ class ItemTable extends Main\Entity\DataManager
                     );
                 },
             ]),
-            new Entity\StringField('SORT',[
+            new Entity\IntegerField('SORT',[
                 'save_data_modification' => function () {
                     return array(
                         function ($value) {
