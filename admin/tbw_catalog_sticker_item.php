@@ -139,6 +139,7 @@ if(
                                 unset($picture_options[$key_opt]);
                                 continue;
                             }
+
                             switch($key_opt){
                                 case'IMAGE':
                                     $arImageFileds=$option;
@@ -150,6 +151,8 @@ if(
                                         if($TYPE_OPTIONS_del[$type_opt][$picture_type]['IMAGE']){
                                             CFile::Delete($arImageFileds);
                                             $arImageFileds=NULL;
+                                            unset($picture_options[$key_opt]);
+                                            continue;
                                         }else{
                                             $arImageFileds=CFile::MakeFileArray($arImageFileds);
                                         }
@@ -165,7 +168,7 @@ if(
                                         unset($option);
 
                                     $option=$result_save_file;
-
+                                    unset($arImageFileds,$result_save_file);
                                     break;
                             }
                         }
@@ -269,7 +272,7 @@ if($ID>0)
         $ID=$Item['ID'];
         $bVarsFromForm = true;
 
-        debugmessage($Item);
+        //debugmessage($Item);
     }
 }
 
