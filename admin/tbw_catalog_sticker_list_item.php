@@ -2,6 +2,8 @@
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
     Bitrix\Main\Type,
+    Bitrix\Catalog\CatalogIblockTable,
+    Bitrix\Iblock\IblockTable,
     TheBestWeb\CatalogSticker,
     TheBestWeb\CatalogSticker\ListTable,
     TheBestWeb\CatalogSticker\ListSectionsTable;
@@ -22,6 +24,11 @@ if (!Loader::includeModule($MODULE_ID))
 }
 
 if (!Loader::includeModule('iblock'))
+{
+    $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_IBLOCK_NOT_INSTALL"));
+    return false;
+}
+if (!Loader::includeModule('catalog'))
 {
     $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_IBLOCK_NOT_INSTALL"));
     return false;
@@ -48,9 +55,18 @@ unset($rsSites);
 unset($arSite);
 
 $IBLOCK_IDS=array();
-$rsCatalog=CCatalog::GetList(array(),array('LID'=>$SITE_ID,'IBLOCK_ACTIVE'=>'Y'),false,false,array());
+$rsCatalog= CatalogIblockTable::GetList();
 while ($arCatalog=$rsCatalog->Fetch()){
-    $IBLOCK_IDS[$arCatalog['IBLOCK_ID']]=$arCatalog['NAME'];
+    if(intval($arCatalog['PRODUCT_IBLOCK_ID'])>0)
+        continue;
+
+    $rsCatalogIblock=\Bitrix\Iblock\IblockSiteTable::GetList(array('filter'=>['IBLOCK_ID'=>$arCatalog['IBLOCK_ID'],'SITE_ID'=>$SITE_ID]));
+    if($arCatalogIblock=$rsCatalogIblock->Fetch()){
+        $rsIblockTable=IblockTable::GetList(array('filter'=>['ID'=>$arCatalogIblock['IBLOCK_ID'],'ACTIVE'=>'Y']));
+        if($arIblockTable=$rsIblockTable->Fetch()){
+            $IBLOCK_IDS[$arIblockTable['ID']]=$arIblockTable['NAME'];
+        }
+    }
 }
 if(empty($IBLOCK_IDS)){
     $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_IBLOCK_CATALOG"));
