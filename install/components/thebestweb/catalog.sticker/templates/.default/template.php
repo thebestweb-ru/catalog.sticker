@@ -45,6 +45,7 @@ if(!empty($arResult['ITEMS'])){
 
     $jsParams['TYPE']=$arResult['TYPE'];
     $jsParams['TYPE_OPTIONS']=$arResult['TYPE_OPTIONS'][$arResult['TYPE']];
+    $jsParams['PRODUCT_ITEM_SELECTOR']='[data-entity="item"]';
 
 
 }
