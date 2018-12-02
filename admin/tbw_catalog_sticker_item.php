@@ -280,6 +280,15 @@ $APPLICATION->SetTitle(($ID>0? Loc::getMessage($MODULE_LANG_PREFIX."_TITLE_EDIT"
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 
+$aMenu[]= array(
+    "TEXT" => Loc::getMessage($MODULE_LANG_PREFIX."_EDIT_BACK" ),
+    "TITLE" => Loc::getMessage($MODULE_LANG_PREFIX."_EDIT_BACK" ),
+    "ICON" => "btn_list",
+    "LINK" => "/bitrix/admin/tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&ID=".$LIST_ID,
+);
+$context = new CAdminContextMenu( $aMenu );
+$context->Show();
+
 CJSCore::Init(array('date'));
 
 if($_REQUEST["mess"] == "ok" && !empty($SITE_ID))

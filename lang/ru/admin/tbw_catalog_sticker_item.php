@@ -1,6 +1,7 @@
 <?php
 $MESS["TBW_CATALOG_STICKER_NOT_INSTALL"] = "Модуль TBW Стикеры в каталоге не установлен";
 $MESS["TBW_CATALOG_STICKER_IBLOCK_NOT_INSTALL"] = "Модуль Инфоблоки не установлен";
+$MESS["TBW_CATALOG_STICKER_EDIT_BACK"] = "Назад к списку";
 $MESS["TBW_CATALOG_STICKER_TAB_MAIN"] = "Основные";
 $MESS["TBW_CATALOG_STICKER_TAB_TYPE"] = "#TYPE#";
 $MESS["TBW_CATALOG_STICKER_TITLE_EDIT"] = "Редактирование стикера";
