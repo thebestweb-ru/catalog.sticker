@@ -15,24 +15,22 @@ $arComponentParameters = array(
         ),
         "CACHE_GROUPS" => array(
             "PARENT" => "CACHE_SETTINGS",
-            "NAME" => GetMessage("KOMBOX_CMP_FILTER_CACHE_GROUPS"),
+            "NAME" => Loc::getMessage($MODULE_LANG_PREFIX."_CACHE_GROUPS"),
             "TYPE" => "CHECKBOX",
             "DEFAULT" => "Y",
         ),
-
+        'SECTION_ID'=>array(
+            "PARENT" => "DATA_SOURCE",
+            "NAME" => Loc::getMessage($MODULE_LANG_PREFIX."_SECTION_ID"),
+            "TYPE" => "STRING",
+            "DEFAULT" => ''
+        ),
+        'IBLOCK_ID'=>array(
+            "PARENT" => "DATA_SOURCE",
+            "NAME" => Loc::getMessage($MODULE_LANG_PREFIX."_IBLOCK_ID"),
+            "TYPE" => "STRING",
+            "DEFAULT" => '={$arParams["IBLOCK_ID"]}',
+        ),
     ),
-);
-$arComponentParameters['PARAMETERS']['SECTION_ID'] = array(
-    "PARENT" => "DATA_SOURCE",
-    "NAME" => GetMessage("KOMBOX_CMP_FILTER_SECTION_ID"),
-    "TYPE" => "STRING",
-    "DEFAULT" => '={$_REQUEST["SECTION_ID"]}',
-);
-
-$arComponentParameters['PARAMETERS']['SECTION_CODE'] = array(
-    "PARENT" => "DATA_SOURCE",
-    "NAME" => GetMessage("KOMBOX_CMP_FILTER_SECTION_CODE"),
-    "TYPE" => "STRING",
-    "DEFAULT" => '',
 );
 ?>

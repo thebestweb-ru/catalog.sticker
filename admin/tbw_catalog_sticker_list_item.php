@@ -221,9 +221,6 @@ if(
     if(!empty($DATE_END))
         $arFields['DATE_END']=new Type\DateTime($DATE_END);
 
-
-
-
     if(!$message){
         // сохранение данных
         if($action =='add')

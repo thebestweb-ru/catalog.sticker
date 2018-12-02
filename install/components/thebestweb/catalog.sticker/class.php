@@ -120,7 +120,6 @@ class CCatalogSticker extends CBitrixComponent
                 return false;
             }
 
-
             $result=array();
             foreach ($arSections as $section_id=>$section){
                 foreach ($this->StickerList as $list_id=>$list){
@@ -140,6 +139,7 @@ class CCatalogSticker extends CBitrixComponent
                 $cache->abortDataCache();
                 return false;
             }
+
 
             $result['ITEMS']=array();
 
