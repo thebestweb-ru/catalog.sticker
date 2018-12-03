@@ -23,6 +23,9 @@ $documentRoot = Main\Application::getDocumentRoot();
 $jsParams=array();
 
 if(!empty($arResult['ITEMS'])){
+    ?>
+    <div id="sticker-items">
+    <?
     foreach ($arResult['ITEMS'] as $KEY_ITEM=>$ITEM){
         $TYPE_OPTIONS=$ITEM['TYPE_OPTIONS'][$ITEM['TYPE']];
 
@@ -42,10 +45,15 @@ if(!empty($arResult['ITEMS'])){
             <?
         }
     }
-
+    ?>
+    </div>
+        <?
     $jsParams['TYPE']=$arResult['TYPE'];
     $jsParams['TYPE_OPTIONS']=$arResult['TYPE_OPTIONS'][$arResult['TYPE']];
     $jsParams['PRODUCT_ITEM_SELECTOR']='[data-entity="item"]';
+    $jsParams['PRODUCT_ROW_SELECTOR']='[data-entity="items-row"]';
+    $jsParams['PRODUCT_CONTAINER_SELECTOR']='[data-entity]';
+    $jsParams['STICKER_SELECTOR']='[data-entity="sticker"]';
 
 
 }
@@ -56,6 +64,6 @@ debugmessage($arResult);
 ?>
 <script>
     jQuery( document ).ready(function($) {
-       $.fn.TWB_CatalogSticker(<?=CUtil::PhpToJSObject($jsParams)?>);
+      $('#sticker-items').TWB_CatalogSticker(<?=CUtil::PhpToJSObject($jsParams)?>);
     });
 </script>
