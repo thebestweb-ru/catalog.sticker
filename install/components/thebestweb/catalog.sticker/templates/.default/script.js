@@ -142,7 +142,56 @@
         },
         setPositions:function(options){
             console.log('setPositions');
+            //
+            var current_pos=0;
+            /*$.each(options.TYPE_OPTIONS , function(index_pos, value) {
+                var val_position=parseInt(value);
+               $.each(options.product_items , function(index_product, item_product) {
+                    current_pos++;
 
+                    if ($(item_product).data('entity') == 'sticker') {
+                        current_pos = 0;
+                        return false;
+                    }
+                    console.log('current_pos');
+                    console.log(current_pos);
+                    if(current_pos==val_position){
+                        console.log('ok');
+                        options.set_product_item=item_product;
+                        options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
+                        $.fn.TWB_CatalogSticker('setStickerItem',options);
+                        current_pos=1;
+
+                        return false;
+                    }
+                });
+            });*/
+           $.each(options.product_items , function(index_product, item_product) {
+               current_pos++;
+
+               if($(item_product).data('entity')=='sticker'){
+                   current_pos=0;
+                   return false;
+               }
+
+               $.each(options.TYPE_OPTIONS , function(index_pos, value) {
+                   var val_position=parseInt(value);
+
+                   if(current_pos==val_position){
+
+                       console.log('ok');
+                       options.set_product_item=item_product;
+                       options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
+                       $.fn.TWB_CatalogSticker('setStickerItem',options);
+                       current_pos=val_position;
+                       return false;
+                   }
+               });
+                console.log('current_pos');
+                console.log(current_pos);
+
+
+            });
 
         },
         setFixedPositions:function(options){
@@ -192,7 +241,16 @@
             }
         }
     };
-
+    function removeKey(arrayName,key)
+    {
+        var x;
+        var tmpArray = new Array();
+        for(x in arrayName)
+        {
+            if(x!=key) { tmpArray[x] = arrayName[x]; }
+        }
+        return tmpArray;
+    };
     $.fn.TWB_CatalogSticker = function (method) {
         // логика вызова метода
         if ( methods[method] ) {
