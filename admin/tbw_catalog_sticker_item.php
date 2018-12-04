@@ -99,7 +99,7 @@ if(
                 }
             }
 
-         /*   if(empty($options)){
+            /*   if(empty($options)){
                 $message = new CAdminMessage(array(
                     'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS"),
                     'TYPE' => 'ERROR',
@@ -141,35 +141,40 @@ if(
                             }
 
                             switch($key_opt){
+                                case 'LINK':
+                                case 'LINK_CLASS':
+                                    break;
                                 case'IMAGE':
-                                    $arImageFileds=$option;
 
-                                    if(is_array($arImageFileds)){
-                                        $arImageFileds['MODULE_ID']=$MODULE_ID;
-                                        $arImageFileds=CIBlock::makeFileArray($arImageFileds,$TYPE_OPTIONS_del[$type_opt][$picture_type]['IMAGE'],$TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE']);
-                                    }elseif(is_numeric($arImageFileds)){
+                                    if(is_array($option)){
+                                        $option['MODULE_ID']=$MODULE_ID;
+                                        $option=CIBlock::makeFileArray($option,$TYPE_OPTIONS_del[$type_opt][$picture_type]['IMAGE'],$TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE']);
+                                        $result_save_file=CFile::SaveFile($option,$MODULE_ID,false,false);
+                                        if(!$result_save_file){
+                                            unset($option);
+                                            continue;
+                                        }
+                                        $option=$result_save_file;
+
+                                    }elseif(is_numeric($option)){
                                         if($TYPE_OPTIONS_del[$type_opt][$picture_type]['IMAGE']){
-                                            CFile::Delete($arImageFileds);
-                                            $arImageFileds=NULL;
-                                            unset($picture_options[$key_opt]);
+                                            CFile::Delete($option);
+                                            unset($option);
                                             continue;
                                         }else{
-                                            $arImageFileds=CFile::MakeFileArray($arImageFileds);
+                                            $arImageFileds=CFile::MakeFileArray($option);
+                                            if($arImageFileds['description']!==$TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE']){
+                                                CFile::UpdateDesc($option, $TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE']);
+                                            }
                                         }
                                     }
 
-                                    if(is_array($arImageFileds)){
-                                        if($TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE'])
-                                            $arImageFileds['description']=$TYPE_OPTIONS_descr[$type_opt][$picture_type]['IMAGE'];
-
-                                        $result_save_file=CFile::SaveFile($arImageFileds,$MODULE_ID,false,false);
-                                    }
-                                    if(!$result_save_file)
-                                        unset($option);
-
-                                    $option=$result_save_file;
                                     unset($arImageFileds,$result_save_file);
                                     break;
+                            }
+                            if(empty($option)){
+                                unset($picture_options[$key_opt]);
+                                continue;
                             }
                         }
                         if(empty($picture_options)){
@@ -180,7 +185,7 @@ if(
                         if(empty($options)){
                             unset($TYPE_OPTIONS[$type_opt]);
                             $message = new CAdminMessage(array(
-                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_sticker[$type_opt])),
+                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_opt)),
                                 'TYPE' => 'ERROR',
                                 'DETAILS' => '',
                                 'HTML' => true
@@ -189,8 +194,66 @@ if(
                     }
 
                     break;
+                case 'VIDEO':
+                    if($TYPE==$type_opt){
+                        if(empty($options['VIDEO'])){
+                            unset($TYPE_OPTIONS[$type_opt]);
+                            $message = new CAdminMessage(array(
+                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_opt)),
+                                'TYPE' => 'ERROR',
+                                'DETAILS' => '',
+                                'HTML' => true
+                            ));
+                            break;
+                        }
+                    }
+
+                    if(is_array($options['VIDEO'])){
+                        foreach($options['VIDEO'] as $type_video=>&$file){
+                            if(is_array($file)){
+                                $file['MODULE_ID']=$MODULE_ID;
+                                $file=CIBlock::makeFileArray($file,$TYPE_OPTIONS_del[$type_opt]['VIDEO'][$type_video]);
+                                $result_save_file=CFile::SaveFile($file,$MODULE_ID,false,false);
+                                if(!$result_save_file){
+                                    unset($file);
+                                    continue;
+                                }
+                                $file=$result_save_file;
+                            }
+                            if(is_numeric($file)){
+                                if($TYPE_OPTIONS_del[$type_opt]['VIDEO'][$type_video]){
+                                    CFile::Delete($file);
+                                    unset($options['VIDEO'][$type_video]);
+                                    continue;
+                                }
+                            }
+
+                        }
+                    }
+                    if(!empty($options['POSTER'])){
+                        if(is_array($options['POSTER'])){
+                            $options['POSTER']['MODULE_ID']=$MODULE_ID;
+                            $options['POSTER']=CIBlock::makeFileArray($options['POSTER'],$TYPE_OPTIONS_del[$type_opt]['POSTER']);
+                            $result_save_file=CFile::SaveFile($options['POSTER'],$MODULE_ID,false,false);
+                            if(!$result_save_file){
+                                unset($options['POSTER']);
+                                continue;
+                            }
+                            $options['POSTER']=$result_save_file;
+                        }
+                        if(is_numeric($options['POSTER'])){
+                            if($TYPE_OPTIONS_del[$type_opt]['POSTER']){
+                                CFile::Delete($options['POSTER']);
+                                unset($options['POSTER']);
+                                continue;
+                            }
+                        }
+                    }
+                    break;
 
             }
+            if(empty($options))
+                unset($TYPE_OPTIONS[$type_opt]);
         }
     }else{
         $message = new CAdminMessage(array(
@@ -221,7 +284,6 @@ if(
 
     if(!empty($DATE_END))
         $arFields['DATE_END']=new Type\DateTime($DATE_END);
-
 
     if(!$message){
         // сохранение данных
@@ -499,6 +561,247 @@ if($message)
                             <td><input type="text" name="TYPE_OPTIONS[PICTURE][MOBILE][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['PICTURE']['MOBILE']['LINK_CLASS'];?>" size="50" ></td>
                         </tr>
                         <?php
+                        break;
+                    case 'VIDEO':
+                        ?>
+
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_MP4")?></td>
+                            <td>
+                                <?if($historyId > 0):?>
+                                    <?echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][MP4]", $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['MP4'], array(
+                                        "IMAGE" => "N",
+                                        "PATH" => "Y",
+                                        "FILE_SIZE" => "Y",
+                                        "DIMENSIONS" => "Y",
+                                        "IMAGE_POPUP" => "Y",
+                                    ));
+                                    ?>
+                                <?else:?>
+                                    <?if (class_exists('\Bitrix\Main\UI\FileInput', true))
+                                    {
+                                        echo \Bitrix\Main\UI\FileInput::createInstance(array(
+                                            "name" => "TYPE_OPTIONS[VIDEO][VIDEO][MP4]",
+                                            "description" => false,
+                                            "upload" => true,
+                                            "allowUpload" => "F",
+                                            "medialib" => true,
+                                            "fileDialog" => true,
+                                            "cloud" => true,
+                                            "delete" => true,
+                                            "maxCount" => 1
+                                        ))->show($bVarsFromForm ? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['MP4'] : ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['MP4']: 0), $bVarsFromForm);
+                                    }
+                                    else
+                                    {
+                                        echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][MP4]", ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['MP4']: 0),
+                                            array(
+                                                "IMAGE" => "N",
+                                                "PATH" => "Y",
+                                                "FILE_SIZE" => "Y",
+                                                "DIMENSIONS" => "Y",
+                                                "IMAGE_POPUP" => "Y",
+                                            ), array(
+                                                'upload' => true,
+                                                'medialib' => true,
+                                                'file_dialog' => true,
+                                                'cloud' => true,
+                                                'del' => true,
+                                                'description' => false,
+                                            )
+                                        );
+                                    }
+                                    ?>
+                                <?endif?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_WEBM")?></td>
+                            <td>
+                                <?if($historyId > 0):?>
+                                    <?echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][WEBM]", $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['WEBM'], array(
+                                        "IMAGE" => "N",
+                                        "PATH" => "Y",
+                                        "FILE_SIZE" => "Y",
+                                        "DIMENSIONS" => "Y",
+                                        "IMAGE_POPUP" => "Y",
+                                    ));
+                                    ?>
+                                <?else:?>
+                                    <?if (class_exists('\Bitrix\Main\UI\FileInput', true))
+                                    {
+                                        echo \Bitrix\Main\UI\FileInput::createInstance(array(
+                                            "name" => "TYPE_OPTIONS[VIDEO][VIDEO][WEBM]",
+                                            "description" => false,
+                                            "upload" => true,
+                                            "allowUpload" => "F",
+                                            "medialib" => true,
+                                            "fileDialog" => true,
+                                            "cloud" => true,
+                                            "delete" => true,
+                                            "maxCount" => 1
+                                        ))->show($bVarsFromForm ? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['WEBM'] : ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['WEBM']: 0), $bVarsFromForm);
+                                    }
+                                    else
+                                    {
+                                        echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][WEBM]", ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['WEBM']: 0),
+                                            array(
+                                                "IMAGE" => "N",
+                                                "PATH" => "Y",
+                                                "FILE_SIZE" => "Y",
+                                                "DIMENSIONS" => "Y",
+                                                "IMAGE_POPUP" => "Y",
+                                            ), array(
+                                                'upload' => true,
+                                                'medialib' => true,
+                                                'file_dialog' => true,
+                                                'cloud' => true,
+                                                'del' => true,
+                                                'description' => false,
+                                            )
+                                        );
+                                    }
+                                    ?>
+                                <?endif?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_OGV")?></td>
+                            <td>
+                                <?if($historyId > 0):?>
+                                    <?echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][OGV]", $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['OGV'], array(
+                                        "IMAGE" => "N",
+                                        "PATH" => "Y",
+                                        "FILE_SIZE" => "Y",
+                                        "DIMENSIONS" => "Y",
+                                        "IMAGE_POPUP" => "Y",
+                                    ));
+                                    ?>
+                                <?else:?>
+                                    <?if (class_exists('\Bitrix\Main\UI\FileInput', true))
+                                    {
+                                        echo \Bitrix\Main\UI\FileInput::createInstance(array(
+                                            "name" => "TYPE_OPTIONS[VIDEO][VIDEO][OGV]",
+                                            "description" => false,
+                                            "upload" => true,
+                                            "allowUpload" => "F",
+                                            "medialib" => true,
+                                            "fileDialog" => true,
+                                            "cloud" => true,
+                                            "delete" => true,
+                                            "maxCount" => 1
+                                        ))->show($bVarsFromForm ? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['OGV'] : ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['OGV']: 0), $bVarsFromForm);
+                                    }
+                                    else
+                                    {
+                                        echo CFileInput::Show("TYPE_OPTIONS[VIDEO][VIDEO][OGV]", ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['VIDEO']['OGV']: 0),
+                                            array(
+                                                "IMAGE" => "N",
+                                                "PATH" => "Y",
+                                                "FILE_SIZE" => "Y",
+                                                "DIMENSIONS" => "Y",
+                                                "IMAGE_POPUP" => "Y",
+                                            ), array(
+                                                'upload' => true,
+                                                'medialib' => true,
+                                                'file_dialog' => true,
+                                                'cloud' => true,
+                                                'del' => true,
+                                                'description' => false,
+                                            )
+                                        );
+                                    }
+                                    ?>
+                                <?endif?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_WIDTH")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[VIDEO][WIDTH]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['WIDTH'];?>" size="30" ></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_HEIGHT")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[VIDEO][HEIGHT]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['HEIGHT'];?>" size="30" ></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_AUTOPLAY")?></td>
+                            <td><?=InputType("checkbox", "TYPE_OPTIONS[VIDEO][AUTOPLAY]", "Y", '',  '','',$Item['TYPE_OPTIONS']['VIDEO']['AUTOPLAY'] ? 'checked':'');?></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_CONTROLS")?></td>
+                            <td><?=InputType("checkbox", "TYPE_OPTIONS[VIDEO][CONTROLS]", "Y", '',  '','',$Item['TYPE_OPTIONS']['VIDEO']['CONTROLS'] ? 'checked':'');?></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_LOOP")?></td>
+                            <td><?=InputType("checkbox", "TYPE_OPTIONS[VIDEO][LOOP]", "Y", '',  '','',$Item['TYPE_OPTIONS']['VIDEO']['LOOP'] ? 'checked':'');?></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_MUTED")?></td>
+                            <td><?=InputType("checkbox", "TYPE_OPTIONS[VIDEO][MUTED]", "Y", '',  '','',$Item['TYPE_OPTIONS']['VIDEO']['MUTED'] ? 'checked':'');?></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_PRELOAD")?></td>
+                            <td><?
+                                echo SelectBoxFromArray("TYPE_OPTIONS[VIDEO][PRELOAD]", array("REFERENCE" => array(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_SELECTED"),"auto","metadata","none"), "REFERENCE_ID" => array("","auto","metadata","none")),$Item['TYPE_OPTIONS']['VIDEO']['PRELOAD']);
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_POSTER")?></td>
+                            <td>
+                                <?if($historyId > 0):?>
+                                    <?echo CFileInput::Show("TYPE_OPTIONS[VIDEO][POSTER]", $Item['TYPE_OPTIONS']['VIDEO']['POSTER'], array(
+                                        "IMAGE" => "Y",
+                                        "PATH" => "Y",
+                                        "FILE_SIZE" => "Y",
+                                        "DIMENSIONS" => "Y",
+                                        "IMAGE_POPUP" => "Y",
+                                    ));
+                                    ?>
+                                <?else:?>
+                                    <?if (class_exists('\Bitrix\Main\UI\FileInput', true))
+                                    {
+                                        echo \Bitrix\Main\UI\FileInput::createInstance(array(
+                                            "name" => "TYPE_OPTIONS[VIDEO][POSTER]",
+                                            "description" => false,
+                                            "upload" => true,
+                                            "allowUpload" => "I",
+                                            "medialib" => true,
+                                            "fileDialog" => true,
+                                            "cloud" => true,
+                                            "delete" => true,
+                                            "maxCount" => 1
+                                        ))->show($bVarsFromForm ? $Item['TYPE_OPTIONS']['VIDEO']['POSTER'] : ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['POSTER']: 0), $bVarsFromForm);
+                                    }
+                                    else
+                                    {
+                                        echo CFileInput::Show("TYPE_OPTIONS[VIDEO][POSTER]", ($ID > 0 && !$bCopy? $Item['TYPE_OPTIONS']['VIDEO']['POSTER']: 0),
+                                            array(
+                                                "IMAGE" => "Y",
+                                                "PATH" => "Y",
+                                                "FILE_SIZE" => "Y",
+                                                "DIMENSIONS" => "Y",
+                                                "IMAGE_POPUP" => "Y",
+                                            ), array(
+                                                'upload' => true,
+                                                'medialib' => true,
+                                                'file_dialog' => true,
+                                                'cloud' => true,
+                                                'del' => true,
+                                                'description' => false,
+                                            )
+                                        );
+                                    }
+                                    ?>
+                                <?endif?>
+                            </td>
+                        </tr>
+                        <?
+                        break;
+                    case 'PRODUCT':
+                        ?>
+
+                        <?
                         break;
                 }
         }
