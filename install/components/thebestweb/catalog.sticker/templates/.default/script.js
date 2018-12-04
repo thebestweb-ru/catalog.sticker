@@ -127,7 +127,6 @@
             $.fn.TWB_CatalogSticker('setStickerItem',options);
         },
         setPositions:function(options){
-            console.log('setPositions');
 
             $.each(options.TYPE_OPTIONS , function(index_pos, value) {
                 var val_position = parseInt(value);
@@ -170,17 +169,18 @@
             return true;
         },
         getStickerItem:function (options) {
-
+            console.log('getStickerItem');
+            console.log(options);
             if(!options.last_sticker){
                 options.last_sticker=options.sticker_items[0];
                 return options.sticker_items[0];
             }
 
-
-            if(options.sticker_items.length<2){
+/*
+            if(options.sticker_items.length<=1){
                 options.last_sticker=options.sticker_items[0];
                 return options.sticker_items[0];
-            }
+            }*/
 
             for (var i = 0; i < options.sticker_items.length; i++) {
                 if(options.sticker_items[i]!==options.last_sticker){

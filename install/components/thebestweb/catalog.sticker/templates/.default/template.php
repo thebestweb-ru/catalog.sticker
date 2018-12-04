@@ -24,10 +24,12 @@ $jsParams=array();
 
 if(!empty($arResult['ITEMS'])){
     ?>
-    <div id="sticker-items">
+    <div id="sticker-items" style="display:none">
     <?
     foreach ($arResult['ITEMS'] as $KEY_ITEM=>$ITEM){
         $TYPE_OPTIONS=$ITEM['TYPE_OPTIONS'][$ITEM['TYPE']];
+        if(empty($TYPE_OPTIONS))
+            continue;
 
         $item_id="sticker-".$arResult['ID']."-".$ITEM['ID'];
         $jsParams['ITEMS_ID'][]=$item_id;
@@ -54,16 +56,17 @@ if(!empty($arResult['ITEMS'])){
     $jsParams['PRODUCT_ROW_SELECTOR']='[data-entity="items-row"]';
     $jsParams['PRODUCT_CONTAINER_SELECTOR']='[data-entity]';
     $jsParams['STICKER_SELECTOR']='[data-entity="sticker"]';
-
+        ?>
+    <script>
+        jQuery( document ).ready(function($) {
+            $('#sticker-items').TWB_CatalogSticker(<?=CUtil::PhpToJSObject($jsParams)?>);
+        });
+    </script>
+<?
 
 }
 
 debugmessage('Список групп для показа');
 debugmessage($arResult);
 
-?>
-<script>
-    jQuery( document ).ready(function($) {
-      $('#sticker-items').TWB_CatalogSticker(<?=CUtil::PhpToJSObject($jsParams)?>);
-    });
-</script>
+

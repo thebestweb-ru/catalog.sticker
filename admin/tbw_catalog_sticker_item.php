@@ -90,6 +90,9 @@ if(
         ));
     }
 
+
+    $TYPE_OPTIONS['PRODUCT']['ID']=intval($PRODUCT_ITEM)>0 ? intval($PRODUCT_ITEM):'';
+
     if(!empty($TYPE_OPTIONS)){
         foreach ($TYPE_OPTIONS as $type_opt=>&$options){
             if(is_array($options)){
@@ -250,7 +253,24 @@ if(
                         }
                     }
                     break;
+                case 'PRODUCT':
+                    //debugmessage($options);
+                    if($TYPE==$type_opt){
+                        if(empty($options['ID'])){
+                            unset($TYPE_OPTIONS[$type_opt]);
+                            $message = new CAdminMessage(array(
+                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_opt)),
+                                'TYPE' => 'ERROR',
+                                'DETAILS' => '',
+                                'HTML' => true
+                            ));
+                            break;
+                        }
+                    }
 
+                    $options['IBLOCK_ID']=CIBlockElement::GetIBlockByID($options['ID']);
+
+                    break;
             }
             if(empty($options))
                 unset($TYPE_OPTIONS[$type_opt]);
@@ -263,6 +283,7 @@ if(
             'HTML' => true
         ));
     }
+
 
 
     // обработка данных формы
@@ -284,6 +305,10 @@ if(
 
     if(!empty($DATE_END))
         $arFields['DATE_END']=new Type\DateTime($DATE_END);
+
+    debugmessage($_REQUEST);
+    debugmessage($arFields);
+    //die();
 
     if(!$message){
         // сохранение данных
@@ -334,7 +359,6 @@ if($ID>0)
         $ID=$Item['ID'];
         $bVarsFromForm = true;
 
-        //debugmessage($Item);
     }
 }
 
@@ -716,6 +740,14 @@ if($message)
                             </td>
                         </tr>
                         <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_LINK")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[VIDEO][LINK]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['LINK'];?>" size="100" ></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_LINK_CLASS")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[VIDEO][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['LINK_CLASS'];?>" size="50" ></td>
+                        </tr>
+                        <tr>
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_WIDTH")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[VIDEO][WIDTH]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['WIDTH'];?>" size="30" ></td>
                         </tr>
@@ -799,7 +831,32 @@ if($message)
                         <?
                         break;
                     case 'PRODUCT':
+                        $prop_fields=array(
+                            'VALUE'=>$Item['TYPE_OPTIONS']['PRODUCT']['ID'],
+                            'LINK_IBLOCK_ID'=>$Item['TYPE_OPTIONS']['PRODUCT']['IBLOCK_ID'],
+                            'PROPERTY_TYPE' => 'E',
+                            'MULTIPLE' => 'N',
+                        );
+                        $strHTMLControlName=array(
+                                'MODE'=>'iblock_element_admin',
+                                'VALUE'=>"PRODUCT_ITEM",
+                        );
                         ?>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_ITEM")?></td>
+                            <td><?
+                                echo CIBlockPropertyElementAutoComplete::GetPropertyFieldHtml($prop_fields, array('VALUE'=>$Item['TYPE_OPTIONS']['PRODUCT']['ID']), $strHTMLControlName);
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_LINK")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PRODUCT][LINK]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['LINK'];?>" size="100" ></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_LINK_CLASS")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PRODUCT][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['LINK_CLASS'];?>" size="50" ></td>
+                        </tr>
 
                         <?
                         break;
