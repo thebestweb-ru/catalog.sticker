@@ -15,10 +15,7 @@
             options.product_rows = $.fn.TWB_CatalogSticker('getProductRow',options);
             options.container_node =$.fn.TWB_CatalogSticker('getContainer',options);
             options.sticker_items=$.fn.TWB_CatalogSticker('getStickerItems',options);
-            options.set_sticker;
-            options.last_sticker;
             options.product_items=$.fn.TWB_CatalogSticker('getProductItems',options);
-            options.set_product_item;
             if(!options.container_node || options.sticker_items.length<0)
                 return false;
 
@@ -48,11 +45,6 @@
 
             // позже, если надо, прекращаем наблюдение
             //observer.disconnect();
-
-            /*//$('.catalog-section').on("change",$.fn.TWB_CatalogSticker('updateContainer',options));
-            console.log(this);
-            console.log(options);
-            //console.log($.fn.TWB_CatalogSticker('getProductItems',options));*/
 
             return this;
         },
@@ -126,71 +118,27 @@
             console.log('setFixed');
             var val_position=parseInt(options.TYPE_OPTIONS);
 
-            $.each(options.product_items , function(index_product, item_product) {
+            if ($(options.product_items[val_position]).data('entity') == 'sticker') {
+                return;
+            }
 
-                if($(item_product).data('entity')=='sticker'){
-                    return false;
-                }
-
-                if(index_product==val_position){
-                    options.set_product_item=item_product;
-                    options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
-                    $.fn.TWB_CatalogSticker('setStickerItem',options);
-                    return false;
-                }
-            });
+            options.set_product_item=options.product_items[val_position];
+            options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
+            $.fn.TWB_CatalogSticker('setStickerItem',options);
         },
         setPositions:function(options){
             console.log('setPositions');
-            //
-            var current_pos=0;
-            /*$.each(options.TYPE_OPTIONS , function(index_pos, value) {
-                var val_position=parseInt(value);
-               $.each(options.product_items , function(index_product, item_product) {
-                    current_pos++;
 
-                    if ($(item_product).data('entity') == 'sticker') {
-                        current_pos = 0;
-                        return false;
-                    }
-                    console.log('current_pos');
-                    console.log(current_pos);
-                    if(current_pos==val_position){
-                        console.log('ok');
-                        options.set_product_item=item_product;
-                        options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
-                        $.fn.TWB_CatalogSticker('setStickerItem',options);
-                        current_pos=1;
+            $.each(options.TYPE_OPTIONS , function(index_pos, value) {
+                var val_position = parseInt(value);
 
-                        return false;
-                    }
-                });
-            });*/
-           $.each(options.product_items , function(index_product, item_product) {
-               current_pos++;
+                if ($(options.product_items[val_position]).data('entity') == 'sticker') {
+                    return;
+                }
 
-               if($(item_product).data('entity')=='sticker'){
-                   current_pos=0;
-                   return false;
-               }
-
-               $.each(options.TYPE_OPTIONS , function(index_pos, value) {
-                   var val_position=parseInt(value);
-
-                   if(current_pos==val_position){
-
-                       console.log('ok');
-                       options.set_product_item=item_product;
-                       options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
-                       $.fn.TWB_CatalogSticker('setStickerItem',options);
-                       current_pos=val_position;
-                       return false;
-                   }
-               });
-                console.log('current_pos');
-                console.log(current_pos);
-
-
+                options.set_product_item = options.product_items[val_position];
+                options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem', options);
+                $.fn.TWB_CatalogSticker('setStickerItem', options);
             });
 
         },
@@ -218,6 +166,7 @@
             var product_node=$(options.set_product_item).parent( "div" )[0];
             var sticker_clone=$(options.set_sticker).clone();
             $(sticker_clone).insertBefore($(product_node));
+            options.product_items=$.fn.TWB_CatalogSticker('getProductItems',options);
             return true;
         },
         getStickerItem:function (options) {
@@ -261,81 +210,5 @@
             $.error( 'Метод ' +  method + ' в jQuery.TWB_CatalogSticker не существует' );
         }
     };
-
-/*
-    function TWB_GetCatalogItems(){
-        var items=$('[data-entity="item"]');
-        var result={};
-
-        if(items.length>0){
-            $.each(items , function(index, item) {
-                index++;
-                result[index]=item;
-            });
-            return result;
-        }
-
-        return;
-    }
-
-    function TWB_InsertSticker(item_product,sticker){
-        console.log('TWB_InsertSticker');
-        var product=item_product.parent( "div" )[0];
-        console.log(product);
-        console.log(sticker);
-        var sticker_clone=$(sticker).clone();
-        //product.before(sticker_clone);
-        $(sticker).clone().insertBefore($(product));
-    }
-
-    $.fn.TWB_CatalogSticker2 = function(params){
-        var product_items;
-        var cnt_product_items;
-        var item=[];
-
-        console.log(params);
-
-
-        product_items=TWB_GetCatalogItems();
-        cnt_product_items=product_items.length;
-
-        console.log(product_items);
-        $.each(params.ITEMS_ID , function(index, val) {
-            var el=$('#'+val);
-
-            if(el[0])
-                item.push(el[0]);
-        });
-
-        if(params.TYPE == 'POSITIONS'){
-
-            $.each(product_items , function(index_product, item_product) {
-                var cath=false;
-
-                cath=$.each(params.TYPE_OPTIONS , function(index_position, val_position) {
-                    val_position=parseInt(val_position);
-
-
-                    if(index_product==val_position){
-                        console.log('Совпали позиции');
-                        console.log();
-                        //console.log('Позиция товара '+index_product);
-                        //console.log('Позиция стикера '+val_position);
-
-                        TWB_InsertSticker($(item_product),item[0]);
-
-                        return true;
-                    }
-                });
-
-
-            });
-
-        }
-
-        console.log(item);
-
-        return this;
-    }*/
 
 })(jQuery);
