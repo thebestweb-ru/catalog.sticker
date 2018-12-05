@@ -4,7 +4,7 @@ use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Type,
     Bitrix\Catalog\CatalogIblockTable,
     Bitrix\Iblock\IblockTable,
-    TheBestWeb\CatalogSticker,
+    TheBestWeb\CCatalogSticker,
     TheBestWeb\CatalogSticker\ListTable,
     TheBestWeb\CatalogSticker\ListSectionsTable;
 
@@ -291,7 +291,7 @@ if(
         $bVarsFromForm = true;
     }
 }
-$default_type_keys=array_keys (CatalogSticker::GetTypeGroupStickers());
+$default_type_keys=array_keys (CCatalogSticker::GetTypeGroupStickers());
 $default_type=$default_type_keys[0];
 
 // выборка данных
@@ -369,7 +369,7 @@ if($message)
             <td><span class="required">*</span><?=Loc::getMessage($MODULE_LANG_PREFIX."_FIELD_TYPE")?></td>
             <td>
                 <?
-                echo SelectBoxFromArray("TYPE", array("REFERENCE" => array_values (CatalogSticker::GetTypeGroupStickers()), "REFERENCE_ID" => array_keys (CatalogSticker::GetTypeGroupStickers())),$Item['TYPE'],'','onchange="ChangeTypeOptions(this.value)"');
+                echo SelectBoxFromArray("TYPE", array("REFERENCE" => array_values (CCatalogSticker::GetTypeGroupStickers()), "REFERENCE_ID" => array_keys (CCatalogSticker::GetTypeGroupStickers())),$Item['TYPE'],'','onchange="ChangeTypeOptions(this.value)"');
                 ?>
             </td>
         </tr>

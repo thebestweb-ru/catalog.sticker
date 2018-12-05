@@ -16,7 +16,8 @@ use \Bitrix\Main;
 if(method_exists($this, 'setFrameMode'))
     $this->setFrameMode(true);
 
-
+if($arParams['INCLUDE_JQUERY']=='Y')
+    CJSCore::Init(array("Jquery2"));
 
 $documentRoot = Main\Application::getDocumentRoot();
 
@@ -63,10 +64,4 @@ if(!empty($arResult['ITEMS'])){
         });
     </script>
 <?
-
 }
-
-debugmessage('Список групп для показа');
-debugmessage($arResult);
-
-

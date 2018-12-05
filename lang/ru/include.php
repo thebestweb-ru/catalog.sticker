@@ -1,4 +1,9 @@
 <?
-
-
+$MESS["TBW_CATALOG_STICKER_POSITIONS"] = 'Позиционное';
+$MESS["TBW_CATALOG_STICKER_FIXED"] = 'Фиксированное';
+$MESS["TBW_CATALOG_STICKER_FIXED_POSITIONS"] = 'Фиксированное чередование';
+$MESS["TBW_CATALOG_STICKER_HTML"] = 'HTML Блок';
+$MESS["TBW_CATALOG_STICKER_PICTURE"] = 'Картинка';
+$MESS["TBW_CATALOG_STICKER_VIDEO"] = 'Видео';
+$MESS["TBW_CATALOG_STICKER_PRODUCT"] = 'Товар';
 ?>

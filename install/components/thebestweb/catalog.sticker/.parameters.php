@@ -1,11 +1,20 @@
 <?
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
+
 use Bitrix\Main\Localization\Loc;
 
-if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
+/**
+ * @var string $componentPath
+ * @var string $componentName
+ * @var array $arCurrentValues
+ * @global CUserTypeManager $USER_FIELD_MANAGER
+ */
 
 global $APPLICATION;
 
 $MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
+
+CBitrixComponent::includeComponentClass($componentName);
 
 $arComponentParameters = array(
     "PARAMETERS" => array(
@@ -18,6 +27,12 @@ $arComponentParameters = array(
             "NAME" => Loc::getMessage($MODULE_LANG_PREFIX."_CACHE_GROUPS"),
             "TYPE" => "CHECKBOX",
             "DEFAULT" => "Y",
+        ),
+
+        "INCLUDE_JQUERY" => array(
+            "NAME" => Loc::getMessage($MODULE_LANG_PREFIX."_INCLUDE_JQUERY"),
+            "TYPE" => "CHECKBOX",
+            "DEFAULT" => "N",
         ),
         'SECTION_ID'=>array(
             "PARENT" => "DATA_SOURCE",

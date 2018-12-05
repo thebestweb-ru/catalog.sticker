@@ -43,10 +43,17 @@ if ($APPLICATION->GetGroupRight($iModuleID) != "D") {
         "parent_menu" => "global_menu_services",
         "icon" => "fileman_sticker_icon",
         "page_icon" => "default_page_icon",
+        "section" => $iModuleID,
         "text" => Loc::getMessage($iModuleLangID."_ADMIN_MENU_TEXT"),
         "title" => Loc::getMessage($iModuleLangID."_ADMIN_MENU_TEXT"),
         "items" => array($Lists),
-        "more_url"=> array("tbw_catalog_sticker_list_item.php","tbw_catalog_sticker_item.php","tbw_catalog_sticker_item_list.php"),
+        "items_id" => $iModuleID."_main",
+        "more_url"=> array(
+            "tbw_catalog_sticker_list.php",
+            "tbw_catalog_sticker_list_item.php",
+            "tbw_catalog_sticker_item_list.php",
+            "tbw_catalog_sticker_item.php"
+        ),
     );
     return $aMenu;
 }

@@ -28,7 +28,6 @@
                     if(mutation.target!==options.container_node)
                         return false;
 
-                    console.log(mutation.type);
                     options.product_items=$.fn.TWB_CatalogSticker('getProductItems',options);
                     options.product_rows = $.fn.TWB_CatalogSticker('getProductRow',options);
                     $.fn.TWB_CatalogSticker('setSticker',options);
@@ -50,8 +49,6 @@
         },
         setSticker:function(options){
             console.log('setSticker');
-            console.log(options);
-
             switch (options.TYPE){
 
                 case "FIXED":
@@ -64,7 +61,8 @@
                     $.fn.TWB_CatalogSticker('setFixedPositions',options);
                     break;
             }
-
+            console.log(options);
+            return this;
         },
         getStickerItems:function(options){
             var item=[];
@@ -115,7 +113,6 @@
 
         },
         setFixed:function (options) {
-            console.log('setFixed');
             var val_position=parseInt(options.TYPE_OPTIONS);
 
             if ($(options.product_items[val_position]).data('entity') == 'sticker') {
@@ -125,9 +122,9 @@
             options.set_product_item=options.product_items[val_position];
             options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem',options);
             $.fn.TWB_CatalogSticker('setStickerItem',options);
+            return this;
         },
         setPositions:function(options){
-
             $.each(options.TYPE_OPTIONS , function(index_pos, value) {
                 var val_position = parseInt(value);
 
@@ -139,10 +136,9 @@
                 options.set_sticker = $.fn.TWB_CatalogSticker('getStickerItem', options);
                 $.fn.TWB_CatalogSticker('setStickerItem', options);
             });
-
+            return this;
         },
         setFixedPositions:function(options){
-            console.log('setFixedPositions');
             var val_position=parseInt(options.TYPE_OPTIONS);
             var current_pos=0;
 
@@ -160,46 +156,36 @@
                     current_pos=1;
                 }
             });
+            return this;
         },
         setStickerItem:function (options) {
             var product_node=$(options.set_product_item).parent( "div" )[0];
-            var sticker_clone=$(options.set_sticker).clone();
+            var sticker_clone=$(options.sticker_items[options.set_sticker]).clone();
             $(sticker_clone).insertBefore($(product_node));
             options.product_items=$.fn.TWB_CatalogSticker('getProductItems',options);
-            return true;
+            return this;
         },
         getStickerItem:function (options) {
-            console.log('getStickerItem');
-            console.log(options);
-            if(!options.last_sticker){
-                options.last_sticker=options.sticker_items[0];
-                return options.sticker_items[0];
+            var i = 0;
+            if(options.last_sticker!==undefined){
+                i = options.last_sticker;
+            }else{
+                options.last_sticker=i;
+                return i;
+            }
+            i++;
+
+            if(i<=options.sticker_items.length){
+                options.last_sticker=i;
+                return i;
+            }else{
+                options.last_sticker=undefined;
+                return 0;
             }
 
-/*
-            if(options.sticker_items.length<=1){
-                options.last_sticker=options.sticker_items[0];
-                return options.sticker_items[0];
-            }*/
+        }
+    };
 
-            for (var i = 0; i < options.sticker_items.length; i++) {
-                if(options.sticker_items[i]!==options.last_sticker){
-                    options.last_sticker=options.sticker_items[i];
-                    return options.sticker_items[i];
-                }
-            }
-        }
-    };
-    function removeKey(arrayName,key)
-    {
-        var x;
-        var tmpArray = new Array();
-        for(x in arrayName)
-        {
-            if(x!=key) { tmpArray[x] = arrayName[x]; }
-        }
-        return tmpArray;
-    };
     $.fn.TWB_CatalogSticker = function (method) {
         // логика вызова метода
         if ( methods[method] ) {

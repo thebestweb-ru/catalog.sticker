@@ -16,3 +16,4 @@ $MESS["TBW_CATALOG_STICKER_LIST_ACTIONS_DEL"] = "Удалить";
 $MESS["TBW_CATALOG_STICKER_LIST_ACTIONS_DEL_CONF"] = "Вы действительно хотите удалить эти элементы?";
 $MESS["TBW_CATALOG_STICKER_LIST_TITLE"] = "Группа стикеров [ #TITLE# ]";
 $MESS["TBW_CATALOG_STICKER_BACK_LIST"] = "Назад к группам";
+$MESS["TBW_CATALOG_STICKER_ADD"] = "Добавить стикер";

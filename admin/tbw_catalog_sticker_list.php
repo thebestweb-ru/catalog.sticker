@@ -29,8 +29,6 @@ if($POST_RIGHT=="D")
     $APPLICATION->AuthForm(Loc::getMessage("ACCESS_DENIED"));
 
 
-
-
 $sTableID=ListTable::getTableName();
 
 $SITE_ID=$_REQUEST['site'] ? $_REQUEST['site'] : null;
@@ -63,8 +61,6 @@ if(count($arSites)<=1){
 }
 unset($rsSites);
 unset($arSite);
-
-
 
 
 $by=$_REQUEST['by'] ? $_REQUEST['by'] : "ID";
@@ -175,7 +171,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
                 break;
             case "activate":
             case "deactivate":
-                $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 1 : 0);
+                $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 'Y' : '');
 
                     $result = ListTable::update($ID, array(
                         'ACTIVE' => $arFields["ACTIVE"],
@@ -253,7 +249,7 @@ while($arRes = $rsData->NavNext(true, "f_"))
     $row =& $lAdmin->AddRow($f_ID, $arRes);
 
     $row->AddInputField("ID", array("size"=>40));
-    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item_list.php?site='.$SITE_ID.'&ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
+    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item_list.php?site='.$SITE_ID.'&LIST_ID='.$f_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
 
     $row->AddInputField("SORT", array("size"=>20));
 
@@ -265,7 +261,7 @@ while($arRes = $rsData->NavNext(true, "f_"))
         "ICON"=>"view",
         "DEFAULT"=>true,
         "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_ITEM_LIST"),
-        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item_list.php?site=".$SITE_ID."&ID=".$f_ID."&lang=".LANG)
+        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item_list.php?site=".$SITE_ID."&LIST_ID=".$f_ID."&lang=".LANG)
     );
     // редактирование элемента
     $arActions[] = array(
@@ -300,14 +296,14 @@ $lAdmin->AddFooter(
 // групповые действия
 $lAdmin->AddGroupActionTable(Array(
     "delete"=>Loc::getMessage("MAIN_ADMIN_LIST_DELETE"),
-    "activate" => GetMessage("MAIN_ADMIN_LIST_ACTIVATE"),
-    "deactivate" => GetMessage("MAIN_ADMIN_LIST_DEACTIVATE"),
+    "activate" => Loc::getMessage("MAIN_ADMIN_LIST_ACTIVATE"),
+    "deactivate" => Loc::getMessage("MAIN_ADMIN_LIST_DEACTIVATE"),
 ));
 $aContext = array(
     array(
-        "TEXT"=>GetMessage("MAIN_ADD"),
+        "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_ADD"),
         "LINK"=>"tbw_catalog_sticker_list_item.php?site=".$SITE_ID."&lang=".LANG,
-        "TITLE"=>GetMessage("MAIN_ADD"),
+        "TITLE"=>Loc::getMessage($MODULE_LANG_PREFIX."_ADD"),
         "ICON"=>"btn_new",
     ),
 );

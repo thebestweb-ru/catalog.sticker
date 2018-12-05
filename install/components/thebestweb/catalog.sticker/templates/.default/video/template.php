@@ -17,7 +17,7 @@ if($TYPE_OPTIONS['POSTER'])
     <?if(!empty($TYPE_OPTIONS['LINK'])):?>
     <a href="<?=$TYPE_OPTIONS['LINK']?>" class="<?=$TYPE_OPTIONS['LINK_CLASS']?>">
     <?endif;?>
-    <video <?=$TYPE_OPTIONS['WIDTH']?'width="'.$TYPE_OPTIONS['WIDTH'].'" ':''?><?=$TYPE_OPTIONS['HEIGHT']?'height="'.$TYPE_OPTIONS['HEIGHT'].'" ':''?><?=$TYPE_OPTIONS['CONTROLS']?'controls ':''?><?=$TYPE_OPTIONS['AUTOPLAY']?'autoplay ':''?><?=$TYPE_OPTIONS['LOOP']?'loop ':''?><?=$TYPE_OPTIONS['MUTED']?'muted ':''?><?=$POSTER['SRC']?'poster="'.$POSTER['SRC'].'"':''?>>
+    <video playsinline webkit-playsinline <?=$TYPE_OPTIONS['WIDTH']?'width="'.$TYPE_OPTIONS['WIDTH'].'" ':''?><?=$TYPE_OPTIONS['HEIGHT']?'height="'.$TYPE_OPTIONS['HEIGHT'].'" ':''?><?=$TYPE_OPTIONS['CONTROLS']?'controls ':''?><?=$TYPE_OPTIONS['AUTOPLAY']?'autoplay ':''?><?=$TYPE_OPTIONS['LOOP']?'loop ':''?><?=$TYPE_OPTIONS['MUTED']?'muted ':''?><?=$POSTER['SRC']?'poster="'.$POSTER['SRC'].'"':''?>>
     <?foreach ($TYPE_OPTIONS['VIDEO'] as $video_type=>$file){
         $file=CFile::GetFileArray($file);
         if(empty($file['SRC']))

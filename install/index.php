@@ -82,9 +82,7 @@ Class thebestweb_catalog_sticker extends CModule{
 	function InstallFiles($arParams = array()){
         CopyDirFiles($this->GetPath()."/install/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin");
         CopyDirFiles($this->GetPath()."/install/components", $_SERVER["DOCUMENT_ROOT"]."/bitrix/components/", true, true);
-        CopyDirFiles($this->GetPath()."/install/js/", $_SERVER["DOCUMENT_ROOT"]."/bitrix/js/", true, true);
-
-		return true;
+        return true;
 	}
 
 	function UnInstallFiles(){
@@ -101,7 +99,6 @@ Class thebestweb_catalog_sticker extends CModule{
 				closedir($dir);
 			}
 		}
-        DeleteDirFilesEx("/bitrix/js/thebestweb/".$this->MODULE_ID.'/');
 
 		if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->GetPath().'/install/files')){
 			$this->deleteArbitraryFiles();

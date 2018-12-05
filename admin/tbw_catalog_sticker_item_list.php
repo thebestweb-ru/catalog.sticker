@@ -1,6 +1,7 @@
 <?
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
+    TheBestWeb\CCatalogSticker,
     TheBestWeb\CatalogSticker\ListTable,
     TheBestWeb\CatalogSticker\ItemTable;
 
@@ -61,10 +62,12 @@ if(count($arSites)<=1){
 unset($rsSites);
 unset($arSite);
 
+$type_sticker=CCatalogSticker::GetTypeStickers();
 
 $ID = intval($ID);
+$LIST_ID = intval($LIST_ID);
 
-$rsStickerGroup = ListTable::GetList(Array("filter" => ['ID'=>$ID,'SITE_ID'=>$SITE_ID]));
+$rsStickerGroup = ListTable::GetList(Array("filter" => ['ID'=>$LIST_ID,'SITE_ID'=>$SITE_ID]));
 if (!$arStickerGroup = $rsStickerGroup->Fetch()) {
     $APPLICATION->ThrowException(Loc::getMessage($MODULE_LANG_PREFIX."_NOT_FIND_LIST_GROUP"));
     return false;
@@ -136,7 +139,7 @@ if (CheckFilter())
     if(empty($arFilter['DATE_END'])) unset($arFilter['DATE_END']);
 }
 
-$arFilter['LIST_ID']=$ID;
+$arFilter['LIST_ID']=$LIST_ID;
 
 // обработка одиночных и групповых действий
 if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
@@ -178,7 +181,7 @@ if(($arID = $lAdmin->GroupAction()) && $POST_RIGHT=="W")
                 break;
             case "activate":
             case "deactivate":
-                $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 1 : 0);
+            $arFields["ACTIVE"] = ($_REQUEST['action']=="activate"? 'Y' : '');
 
                     $result = ItemTable::update($ID, array(
                         'ACTIVE' => $arFields["ACTIVE"],
@@ -251,11 +254,13 @@ while($arRes = $rsData->NavNext(true, "f_"))
     $row =& $lAdmin->AddRow($f_ID, $arRes);
 
     $row->AddInputField("ID", array("size"=>40));
-    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item.php?site='.$SITE_ID.'&ID='.$f_ID.'&LIST_ID='.$ID.'&lang='.LANG.'">'.$f_ID.'</a>');
+    $row->AddViewField("ID", '<a href="tbw_catalog_sticker_item.php?site='.$SITE_ID.'&ID='.$f_ID.'&LIST_ID='.$LIST_ID.'&lang='.LANG.'">'.$f_ID.'</a>');
 
     $row->AddInputField("SORT", array("size"=>20));
 
     $row->AddCheckField("ACTIVE");
+
+    $row->AddViewField("TYPE", $type_sticker[$f_TYPE]);
 
     $arActions = Array();
 
@@ -264,7 +269,7 @@ while($arRes = $rsData->NavNext(true, "f_"))
         "ICON"=>"edit",
         "DEFAULT"=>true,
         "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_LIST_ACTIONS_EDIT"),
-        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item.php?site=".$SITE_ID."&ID=".$f_ID."&LIST_ID=".$ID."&lang=".LANG)
+        "ACTION"=>$lAdmin->ActionRedirect("tbw_catalog_sticker_item.php?site=".$SITE_ID."&ID=".$f_ID."&LIST_ID=".$LIST_ID."&lang=".LANG)
     );
 
     // удаление элемента
@@ -291,19 +296,14 @@ $lAdmin->AddFooter(
 // групповые действия
 $lAdmin->AddGroupActionTable(Array(
     "delete"=>Loc::getMessage("MAIN_ADMIN_LIST_DELETE"),
-    "activate" => GetMessage("MAIN_ADMIN_LIST_ACTIVATE"),
-    "deactivate" => GetMessage("MAIN_ADMIN_LIST_DEACTIVATE"),
+    "activate" => Loc::getMessage("MAIN_ADMIN_LIST_ACTIVATE"),
+    "deactivate" => Loc::getMessage("MAIN_ADMIN_LIST_DEACTIVATE"),
 ));
 $aContext = array(
     array(
-        "TEXT" => Loc::getMessage($MODULE_LANG_PREFIX."_BACK_LIST"),
-        "LINK" => "tbw_catalog_sticker_list.php?site=".$SITE_ID."&lang=".LANG,
-        "ICON" => "btn_list",
-    ),
-    array(
-        "TEXT"=>GetMessage("MAIN_ADD"),
-        "LINK"=>"tbw_catalog_sticker_item.php?site=".$SITE_ID."&LIST_ID=".$ID."&lang=".LANG,
-        "TITLE"=>GetMessage("MAIN_ADD"),
+        "TEXT"=>Loc::getMessage($MODULE_LANG_PREFIX."_ADD"),
+        "LINK"=>"tbw_catalog_sticker_item.php?site=".$SITE_ID."&LIST_ID=".$LIST_ID."&lang=".LANG,
+        "TITLE"=>Loc::getMessage($MODULE_LANG_PREFIX."_ADD"),
         "ICON"=>"btn_new",
     ),
 );
@@ -342,6 +342,7 @@ $oFilter = new CAdminFilter(
         <?echo bitrix_sessid_post();?>
         <input type="hidden" name="lang" value="<?=LANG?>">
         <input type="hidden" name="site" value="<?=$SITE_ID?>">
+        <input type="hidden" name="LIST_ID" value="<?=$LIST_ID?>">
         <?$oFilter->Begin();?>
         <tr>
             <td><?="ID"?>:</td>
@@ -392,6 +393,14 @@ $oFilter = new CAdminFilter(
     </form>
 
 <?
+$aMenu[]= array(
+    "TEXT" => Loc::getMessage($MODULE_LANG_PREFIX."_BACK_LIST" ),
+    "TITLE" => Loc::getMessage($MODULE_LANG_PREFIX."_BACK_LIST" ),
+    "ICON" => "btn_list",
+    "LINK" => "/bitrix/admin/tbw_catalog_sticker_list.php?lang=".LANG."&site=".$SITE_ID,
+);
+$context = new CAdminContextMenu( $aMenu );
+$context->Show();
 // выведем таблицу списка элементов
 $lAdmin->DisplayList();
 ?>

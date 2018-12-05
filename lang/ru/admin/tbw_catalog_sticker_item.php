@@ -28,6 +28,7 @@ $MESS["TBW_CATALOG_STICKER_VIDEO_MUTED"] = "Выключает звук при �
 $MESS["TBW_CATALOG_STICKER_VIDEO_PRELOAD"] = "Предварительная загрузка видеоконтента";
 $MESS["TBW_CATALOG_STICKER_VIDEO_POSTER"] = "URL файла изображения, которое будет отображаться во время загрузки видеофайла или до тех пор, пока пользователь не нажмет на кнопку PLAY";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_ITEM"] = "Привязка к товару";
+$MESS["TBW_CATALOG_STICKER_PRODUCT_COMPONENT_TEMPLATE"] = "Название шаблона для вывода компонента bitrix.item";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_LINK"] = "Ссылка";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_LINK_CLASS"] = "Доп. класс ссылки";
 

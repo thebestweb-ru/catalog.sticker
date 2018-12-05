@@ -10,8 +10,6 @@ use \Bitrix\Main\Localization\Loc;
  * @var CatalogSectionComponent $component
  */
 
-//debugmessage($ITEM);
-//debugmessage($TYPE_OPTIONS);
 ?>
 <div class="sticker-picture">
     <div class="uk-card uk-card-default">

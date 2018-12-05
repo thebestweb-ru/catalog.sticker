@@ -1,18 +1,48 @@
 <?
+namespace TheBestWeb;
 
-use Bitrix\Main\Application;
+use Bitrix\Main\Application,
+    Bitrix\Main\Loader,
+    Bitrix\Main\Localization\Loc;
 
 $module_id = 'thebestweb.catalog.sticker';
 
 
-\Bitrix\Main\Loader::registerAutoLoadClasses(
+Loc::loadMessages(__FILE__);
+
+Loader::registerAutoLoadClasses(
     $module_id,
     array(
         "\TheBestWeb\CatalogSticker\ListTable"=> "/lib/tbw_catalog_sticker_table.php",
         "\TheBestWeb\CatalogSticker\ListSectionsTable"=> "/lib/tbw_catalog_sticker_table.php",
         "\TheBestWeb\CatalogSticker\ItemTable"=> "/lib/tbw_catalog_sticker_table.php",
-        "\TheBestWeb\CatalogSticker"=> "/lib/tbw_catalog_sticker.php",
     )
 );
+class CCatalogSticker {
 
+    const MODULE_ID = 'thebestweb.catalog.sticker';
+    const MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
+
+    public function __construct()
+    {
+
+    }
+
+    public static function GetTypeGroupStickers(){
+        return array(
+            'POSITIONS'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_POSITIONS"),
+            'FIXED'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_FIXED"),
+            'FIXED_POSITIONS'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_FIXED_POSITIONS"),
+        );
+    }
+
+    public static function GetTypeStickers(){
+        return array(
+            'HTML'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_HTML"),
+            'PICTURE'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_PICTURE"),
+            'VIDEO'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_VIDEO"),
+            'PRODUCT'=>Loc::getMessage(self::MODULE_LANG_PREFIX."_PRODUCT"),
+        );
+    }
+}
 ?>

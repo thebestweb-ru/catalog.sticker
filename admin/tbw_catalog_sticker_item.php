@@ -2,7 +2,7 @@
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
     Bitrix\Main\Type,
-    TheBestWeb\CatalogSticker,
+    TheBestWeb\CCatalogSticker,
     TheBestWeb\CatalogSticker\ItemTable;
 
 require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
@@ -50,7 +50,7 @@ $sTableID=ItemTable::getTableName();
 
 $aTabs[]=array("DIV" => "edit1", "TAB" => Loc::getMessage($MODULE_LANG_PREFIX."_TAB_MAIN"), "ICON"=>"main_user_edit", "TITLE"=>Loc::getMessage($MODULE_LANG_PREFIX."_TAB_MAIN"));
 
-$type_sticker=CatalogSticker::GetTypeStickers();
+$type_sticker=CCatalogSticker::GetTypeStickers();
 foreach ($type_sticker as $key=>$item){
     $aTabs[]=array("DIV" => $key, "TAB" => Loc::getMessage($MODULE_LANG_PREFIX."_TAB_TYPE",array('#TYPE#'=>$item)), "ICON"=>"main_user_edit", "TITLE"=>Loc::getMessage($MODULE_LANG_PREFIX."_TAB_TYPE",array('#TYPE#'=>$item)));
 }
@@ -340,7 +340,7 @@ if(
             LocalRedirect("/bitrix/admin/tbw_catalog_sticker_item.php?lang=".LANG."&site=".$SITE_ID."&ID=".$result->getId()."&LIST_ID=".$LIST_ID."&mess=ok&".$tabControl->ActiveTabParam());
         else
             // если была нажата кнопка "Сохранить" - отправляем к списку элементов.
-            LocalRedirect("/bitrix/admin/tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&ID=".$LIST_ID."&mess=ok&".$tabControl->ActiveTabParam());
+            LocalRedirect("/bitrix/admin/tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&LIST_ID=".$LIST_ID."&mess=ok&".$tabControl->ActiveTabParam());
     }
     else
     {
@@ -370,7 +370,7 @@ $aMenu[]= array(
     "TEXT" => Loc::getMessage($MODULE_LANG_PREFIX."_EDIT_BACK" ),
     "TITLE" => Loc::getMessage($MODULE_LANG_PREFIX."_EDIT_BACK" ),
     "ICON" => "btn_list",
-    "LINK" => "/bitrix/admin/tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&ID=".$LIST_ID,
+    "LINK" => "/bitrix/admin/tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&LIST_ID=".$LIST_ID,
 );
 $context = new CAdminContextMenu( $aMenu );
 $context->Show();
@@ -850,6 +850,10 @@ if($message)
                             </td>
                         </tr>
                         <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_COMPONENT_TEMPLATE")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PRODUCT][COMPONENT_TEMPLATE]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['COMPONENT_TEMPLATE'];?>" size="100" ></td>
+                        </tr>
+                        <tr>
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_LINK")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[PRODUCT][LINK]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['LINK'];?>" size="100" ></td>
                         </tr>
@@ -868,7 +872,7 @@ if($message)
         $tabControl->Buttons(
             array(
                 "disabled"=>($POST_RIGHT<"W"),
-                "back_url"=>"tbw_catalog_sticker_list.php?lang=".LANG."&site=".$SITE_ID."&ID=".$GROUP_ID
+                "back_url"=>"tbw_catalog_sticker_item_list.php?lang=".LANG."&site=".$SITE_ID."&LIST_ID=".$LIST_ID
             )
         );
         // завершаем интерфейс закладки
