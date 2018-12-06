@@ -71,7 +71,9 @@ class CCatalogSticker extends CBitrixComponent
         $arParams = $this->arParams;
 
         $cacheId = serialize($this->arParams);
-        $cacheId .= $USER->GetGroups();
+
+        if($this->arParams['CACHE_GROUPS']=='Y')
+            $cacheId .= $USER->GetGroups();
 
         $cache = Bitrix\Main\Data\Cache::createInstance();
         if ($cache->initCache($this->arParams['CACHE_TIME'], $cacheId, $this->MODULE_ID))
