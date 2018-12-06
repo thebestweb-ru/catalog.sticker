@@ -48,9 +48,7 @@
             return this;
         },
         setSticker:function(options){
-            console.log('setSticker');
             switch (options.TYPE){
-
                 case "FIXED":
                     $.fn.TWB_CatalogSticker('setFixed',options);
                     break;
@@ -61,7 +59,6 @@
                     $.fn.TWB_CatalogSticker('setFixedPositions',options);
                     break;
             }
-            console.log(options);
             return this;
         },
         getStickerItems:function(options){

@@ -20,7 +20,7 @@ use \Bitrix\Main\Localization\Loc;
                     $IMG=CFile::GetFileArray($OPTIONS['IMAGE']);
                     ?>
                     <?if(!empty($OPTIONS['LINK'])):?>
-                        <a href="<?=$OPTIONS['LINK']?>" class="<?=$OPTIONS['LINK_CLASS']?>">
+                        <a href="<?=$OPTIONS['LINK']?>" class="<?=$OPTIONS['LINK_CLASS']?>" <?=$OPTIONS['LINK_ADDITIONAL']?>>
                     <?endif;?>
                         <img src="<?=$IMG['SRC']?>" class="uk-responsive-width uk-responsive-height" alt="<?=$IMG['DESCRIPTION']?>" title="<?=$IMG['DESCRIPTION']?>">
                     <?if(!empty($OPTIONS['LINK'])):?>
@@ -32,7 +32,7 @@ use \Bitrix\Main\Localization\Loc;
                     $IMG=CFile::GetFileArray($OPTIONS['IMAGE']);
                     ?>
                     <?if(!empty($OPTIONS['LINK'])):?>
-                        <a href="<?=$OPTIONS['LINK']?>" class="<?=$OPTIONS['LINK_CLASS']?>">
+                        <a href="<?=$OPTIONS['LINK']?>" class="<?=$OPTIONS['LINK_CLASS']?>" <?=$OPTIONS['LINK_ADDITIONAL']?>>
                     <?endif;?>
                         <img src="<?=$IMG['SRC']?>" class="uk-responsive-width uk-responsive-height" alt="<?=$IMG['DESCRIPTION']?>" title="<?=$IMG['DESCRIPTION']?>">
                     <?if(!empty($OPTIONS['LINK'])):?>

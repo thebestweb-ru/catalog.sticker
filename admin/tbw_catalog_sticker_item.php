@@ -527,6 +527,10 @@ if($message)
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PICTURE_LINK_CLASS")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[PICTURE][DESKTOP][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['PICTURE']['DESKTOP']['LINK_CLASS'];?>" size="50" ></td>
                         </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PICTURE_LINK_ADDITIONAL")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PICTURE][DESKTOP][LINK_ADDITIONAL]" value="<?=$Item['TYPE_OPTIONS']['PICTURE']['DESKTOP']['LINK_ADDITIONAL'];?>" size="100" ></td>
+                        </tr>
                         <tr id="MOBILE_PICTURE" class="adm-detail-file-row">
                             <td  class="adm-detail-valign-top">Мобильная:</td>
                             <td>
@@ -584,6 +588,10 @@ if($message)
                         <tr>
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PICTURE_LINK_CLASS")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[PICTURE][MOBILE][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['PICTURE']['MOBILE']['LINK_CLASS'];?>" size="50" ></td>
+                        </tr>
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PICTURE_LINK_ADDITIONAL")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PICTURE][MOBILE][LINK_ADDITIONAL]" value="<?=$Item['TYPE_OPTIONS']['PICTURE']['MOBILE']['LINK_ADDITIONAL'];?>" size="100" ></td>
                         </tr>
                         <?php
                         break;
@@ -749,6 +757,10 @@ if($message)
                             <td><input type="text" name="TYPE_OPTIONS[VIDEO][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['LINK_CLASS'];?>" size="50" ></td>
                         </tr>
                         <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_LINK_ADDITIONAL")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[VIDEO][LINK_ADDITIONAL]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['LINK_ADDITIONAL'];?>" size="100" ></td>
+                        </tr>
+                        <tr>
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_VIDEO_WIDTH")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[VIDEO][WIDTH]" value="<?=$Item['TYPE_OPTIONS']['VIDEO']['WIDTH'];?>" size="30" ></td>
                         </tr>
@@ -888,7 +900,10 @@ if($message)
                             <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_LINK_CLASS")?></td>
                             <td><input type="text" name="TYPE_OPTIONS[PRODUCT][LINK_CLASS]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['LINK_CLASS'];?>" size="50" ></td>
                         </tr>
-
+                        <tr>
+                            <td><?=Loc::getMessage($MODULE_LANG_PREFIX."_PRODUCT_LINK_ADDITIONAL")?></td>
+                            <td><input type="text" name="TYPE_OPTIONS[PRODUCT][LINK_ADDITIONAL]" value="<?=$Item['TYPE_OPTIONS']['PRODUCT']['LINK_ADDITIONAL'];?>" size="100" ></td>
+                        </tr>
                         <?
                         break;
                 }

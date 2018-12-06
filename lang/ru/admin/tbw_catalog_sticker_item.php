@@ -31,6 +31,9 @@ $MESS["TBW_CATALOG_STICKER_PRODUCT_ITEM"] = "Привязка к товару";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_COMPONENT_TEMPLATE"] = "Название шаблона для вывода компонента bitrix.item";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_LINK"] = "Ссылка";
 $MESS["TBW_CATALOG_STICKER_PRODUCT_LINK_CLASS"] = "Доп. класс ссылки";
+$MESS["TBW_CATALOG_STICKER_PRODUCT_LINK_ADDITIONAL"] = "Доп. атрибуты ссылки";
+$MESS["TBW_CATALOG_STICKER_VIDEO_LINK_ADDITIONAL"] = "Доп. атрибуты ссылки";
+$MESS["TBW_CATALOG_STICKER_PICTURE_LINK_ADDITIONAL"] = "Доп. атрибуты ссылки";
 
 
 $MESS["TBW_CATALOG_STICKER_NOT_REQUIRED_FIELDS_TYPE"] = "Незаполнены обязательные поля настроек у выбранного Вами типа [#TYPE#]";
