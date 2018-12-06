@@ -45,4 +45,7 @@ if($TYPE_OPTIONS['POSTER'])
     <?if(!empty($TYPE_OPTIONS['LINK'])):?>
     </a>
     <?endif;?>
+    <?if(!empty($TYPE_OPTIONS['HTML'])):?>
+        <?=$TYPE_OPTIONS['HTML']?>
+    <?endif;?>
 </div>

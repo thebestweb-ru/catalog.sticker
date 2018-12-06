@@ -198,18 +198,9 @@ if(
 
                     break;
                 case 'VIDEO':
-                    if($TYPE==$type_opt){
-                        if(empty($options['VIDEO'])){
-                            unset($TYPE_OPTIONS[$type_opt]);
-                            $message = new CAdminMessage(array(
-                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_opt)),
-                                'TYPE' => 'ERROR',
-                                'DETAILS' => '',
-                                'HTML' => true
-                            ));
-                            break;
-                        }
-                    }
+
+                    if($VIDEO_HTML_VALUE)
+                        $options['HTML']=$VIDEO_HTML_VALUE;
 
                     if(is_array($options['VIDEO'])){
                         foreach($options['VIDEO'] as $type_video=>&$file){
@@ -252,6 +243,18 @@ if(
                             }
                         }
                     }
+                    if($TYPE==$type_opt){
+                        if(empty($options['VIDEO'])){
+                            unset($TYPE_OPTIONS[$type_opt]);
+                            $message = new CAdminMessage(array(
+                                'MESSAGE' => Loc::getMessage($MODULE_LANG_PREFIX."_NOT_REQUIRED_FIELDS_TYPE",array('#TYPE#'=>$type_opt)),
+                                'TYPE' => 'ERROR',
+                                'DETAILS' => '',
+                                'HTML' => true
+                            ));
+                            break;
+                        }
+                    }
                     break;
                 case 'PRODUCT':
                     //debugmessage($options);
@@ -284,8 +287,6 @@ if(
         ));
     }
 
-
-
     // обработка данных формы
     $arFields = Array(
         "LIST_ID"=> $LIST_ID,
@@ -306,8 +307,8 @@ if(
     if(!empty($DATE_END))
         $arFields['DATE_END']=new Type\DateTime($DATE_END);
 
-    debugmessage($_REQUEST);
-    debugmessage($arFields);
+    //debugmessage($_REQUEST);
+    //debugmessage($arFields);
     //die();
 
     if(!$message){
@@ -826,6 +827,32 @@ if($message)
                                     }
                                     ?>
                                 <?endif?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center">
+                                <?CFileMan::AddHTMLEditorFrame(
+                                    "VIDEO_HTML_VALUE",
+                                    $Item['TYPE_OPTIONS']['VIDEO']['HTML'],
+                                    "TYPE_OPTIONS[VIDEO][TEXT_TYPE]",
+                                    $Item['TYPE_OPTIONS']['VIDEO']['TEXT_TYPE'],
+                                    array(
+                                        'height' => 450,
+                                        'width' => '100%'
+                                    ),
+                                    "N",
+                                    0,
+                                    "",
+                                    "",
+                                    $arIBlock["LID"],
+                                    true,
+                                    false,
+                                    array(
+                                        'toolbarConfig' => CFileMan::GetEditorToolbarConfig("iblock_".(defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1 ? 'public' : 'admin')),
+                                        'saveEditorKey' => $LIST_ID,
+                                        'hideTypeSelector' => '',
+                                    )
+                                );?>
                             </td>
                         </tr>
                         <?
