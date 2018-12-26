@@ -86,7 +86,7 @@ Class thebestweb_catalog_sticker extends CModule{
 	}
 
 	function UnInstallFiles(){
-		\Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"].'/bitrix/components/'.$this->MODULE_ID.'.catalog.sticker/');
+		\Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"].'/bitrix/components/'.$this->MODULE_ID.'/catalog.sticker/');
 
 		if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->GetPath().'/admin')){
 			DeleteDirFiles($_SERVER["DOCUMENT_ROOT"].$this->GetPath().'/install/admin/', $_SERVER["DOCUMENT_ROOT"].'/bitrix/admin');
@@ -94,7 +94,7 @@ Class thebestweb_catalog_sticker extends CModule{
 				while (false !== $item = readdir($dir)){
 					if (in_array($item, $this->exclusionAdminFiles))
 						continue;
-					\Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/'.$this->MODULE_ID.'_'.$item);
+					\Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/'.$item);
 				}
 				closedir($dir);
 			}
