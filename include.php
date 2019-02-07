@@ -1,11 +1,11 @@
 <?
-namespace TheBestWeb;
+namespace TBW;
 
 use Bitrix\Main\Application,
     Bitrix\Main\Loader,
     Bitrix\Main\Localization\Loc;
 
-$module_id = 'thebestweb.catalog.sticker';
+$module_id = 'thebestwebpro.catalog.sticker';
 
 
 Loc::loadMessages(__FILE__);
@@ -13,14 +13,14 @@ Loc::loadMessages(__FILE__);
 Loader::registerAutoLoadClasses(
     $module_id,
     array(
-        "\TheBestWeb\CatalogSticker\ListTable"=> "/lib/tbw_catalog_sticker_table.php",
-        "\TheBestWeb\CatalogSticker\ListSectionsTable"=> "/lib/tbw_catalog_sticker_table.php",
-        "\TheBestWeb\CatalogSticker\ItemTable"=> "/lib/tbw_catalog_sticker_table.php",
+        "\TBW\CatalogSticker\ListTable"=> "/lib/tbw_catalog_sticker_table.php",
+        "\TBW\CatalogSticker\ListSectionsTable"=> "/lib/tbw_catalog_sticker_table.php",
+        "\TBW\CatalogSticker\ItemTable"=> "/lib/tbw_catalog_sticker_table.php",
     )
 );
 class CCatalogSticker {
 
-    const MODULE_ID = 'thebestweb.catalog.sticker';
+    const MODULE_ID = 'thebestwebpro.catalog.sticker';
     const MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 
     public function __construct()

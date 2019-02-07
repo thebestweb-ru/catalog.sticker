@@ -17,7 +17,7 @@ class CCatalogSticker extends CBitrixComponent
     protected $StickerList;
     protected $ShowStickerList;
 
-    var $MODULE_ID = 'thebestweb.catalog.sticker';
+    var $MODULE_ID = 'thebestwebpro.catalog.sticker';
     var $MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 
     public function onIncludeComponentLang()

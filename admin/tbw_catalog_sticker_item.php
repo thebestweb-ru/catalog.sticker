@@ -2,8 +2,8 @@
 use Bitrix\Main\Localization\Loc,
     Bitrix\Main\Loader,
     Bitrix\Main\Type,
-    TheBestWeb\CCatalogSticker,
-    TheBestWeb\CatalogSticker\ItemTable;
+    TBW\CCatalogSticker,
+    TBW\CatalogSticker\ItemTable;
 
 require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -11,7 +11,7 @@ Loc::loadMessages(__FILE__);
 
 global $USER, $APPLICATION, $DB;
 
-$MODULE_ID = 'thebestweb.catalog.sticker';
+$MODULE_ID = 'thebestwebpro.catalog.sticker';
 $MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 
 if (!Loader::includeModule($MODULE_ID))

@@ -4,8 +4,8 @@ use \Bitrix\Main\Application;
 
 Loc::loadMessages(__FILE__);
 
-Class thebestweb_catalog_sticker extends CModule{
-	var	$MODULE_ID = 'thebestweb.catalog.sticker';
+Class thebestwebpro_catalog_sticker extends CModule{
+	var	$MODULE_ID = 'thebestwebpro.catalog.sticker';
 	var	$MODULE_LANG_PREFIX = 'TBW_CATALOG_STICKER';
 	var $MODULE_VERSION;
 	var $MODULE_VERSION_DATE;
@@ -86,7 +86,7 @@ Class thebestweb_catalog_sticker extends CModule{
 	}
 
 	function UnInstallFiles(){
-		\Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"].'/bitrix/components/'.$this->MODULE_ID.'/catalog.sticker/');
+		\Bitrix\Main\IO\Directory::deleteDirectory($_SERVER["DOCUMENT_ROOT"].'/bitrix/components/thebestwebpro/catalog.sticker/');
 
 		if (\Bitrix\Main\IO\Directory::isDirectoryExists($path = $this->GetPath().'/admin')){
 			DeleteDirFiles($_SERVER["DOCUMENT_ROOT"].$this->GetPath().'/install/admin/', $_SERVER["DOCUMENT_ROOT"].'/bitrix/admin');

@@ -1,5 +1,5 @@
 <?php
-namespace TheBestWeb\CatalogSticker;
+namespace TBW\CatalogSticker;
 
 use Bitrix\Main,
     Bitrix\Main\Entity;

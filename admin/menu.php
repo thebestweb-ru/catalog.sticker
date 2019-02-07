@@ -2,7 +2,7 @@
 use \Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
-$iModuleID = "thebestweb.catalog.sticker";
+$iModuleID = "thebestwebpro.catalog.sticker";
 $iModuleLangID = "TBW_CATALOG_STICKER";
 
 if ($APPLICATION->GetGroupRight($iModuleID) != "D") {
