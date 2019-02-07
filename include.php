@@ -25,7 +25,6 @@ class CCatalogSticker {
 
     public function __construct()
     {
-
     }
 
     public static function GetTypeGroupStickers(){
